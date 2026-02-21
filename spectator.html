@@ -301,7 +301,7 @@ function renderUI() {
   const playingMatches = matches.slice(0, courts);
 
   playingMatches.forEach((m, i) => {
-    const courtLabel = i + 1; // Court 1..N always
+    const courtLabel = m.court;
     const winnerClass = m.winner ? 'winner-card' : '';
     grid.innerHTML += `<div class="matchCard ${winnerClass} text-white rounded-lg p-4 text-center">
       <div class="courtTitle font-bold mb-2 frost-text text-lg">Court ${courtLabel}</div>
