@@ -405,10 +405,12 @@ function assignCourtsToMatches(matchList, courtCount) {
   // Shuffle courts and assign
   const shuffledCourts = shuffleArray(courtNumbers);
   
-  return shuffledMatches.map((match, index) => ({
+  const result = shuffledMatches.map((match, index) => ({
     ...match,
     court: shuffledCourts[index % courtCount]
   }));
+  // Sort by court so organizer order matches DB (ORDER BY round, court)
+  return result.sort((a, b) => (a.court ?? 0) - (b.court ?? 0));
 }
 
 function getHeadToHeadResult(team1, team2) {
@@ -816,7 +818,7 @@ function renderUI(){
   const displayedMatches = matches.slice(0, courts);
   displayedMatches.forEach((m,i)=>{
     const winnerClass=m.winner?'winner-card':'winter-card';
-    const courtLabel = i + 1; // Court 1..N always
+    const courtLabel = m.court ?? (i + 1);
     const team1Escaped = m.team1.replace(/'/g, "\\'");
     const team2Escaped = m.team2.replace(/'/g, "\\'");
     grid.innerHTML+=`<div class="matchCard rounded-lg p-4 text-center ${winnerClass} text-white">
