@@ -1,0 +1,844 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pickleball Event Maker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Righteous&family=Bungee&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#07001a;
+      --bg2:#1a0b5e;
+      --bg3:#ff2bd6;
+      --cyan:#22d3ee;
+      --pink:#ff4fd8;
+      --purple:#a855f7;
+      --lime:#a3e635;
+      --glass: rgba(255,255,255,0.08);
+      --glass2: rgba(255,255,255,0.12);
+    }
+    body{
+      background: radial-gradient(1200px 800px at 70% 30%, rgba(255,47,214,.25), transparent 55%),
+                  radial-gradient(1000px 700px at 20% 20%, rgba(34,211,238,.18), transparent 55%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2) 55%, #2d0a55 75%, #12002a);
+      overflow-x:hidden;
+    }
+    #bgFX{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      z-index:0;
+    }
+    #bgFX::before{
+      content:"";
+      position:absolute; inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 1px,
+        transparent 3px,
+        transparent 7px
+      );
+      opacity:.35;
+      mix-blend-mode: overlay;
+    }
+    #bgFX::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(circle at 55% 55%,
+          rgba(255,120,60,.10) 0%,
+          rgba(255,47,214,.22) 12%,
+          rgba(255,47,214,.10) 24%,
+          transparent 38%
+        ),
+        linear-gradient(to bottom,
+          transparent 0%,
+          transparent 52%,
+          rgba(255,47,214,.10) 58%,
+          rgba(34,211,238,.07) 62%,
+          rgba(0,0,0,.35) 78%,
+          rgba(0,0,0,.55) 100%
+        ),
+        repeating-linear-gradient(to right,
+          rgba(34,211,238,.12) 0px,
+          rgba(34,211,238,.12) 1px,
+          transparent 70px,
+          transparent 120px
+        ),
+        repeating-linear-gradient(to bottom,
+          rgba(34,211,238,.10) 0px,
+          rgba(34,211,238,.10) 1px,
+          transparent 55px,
+          transparent 95px
+        );
+      transform: perspective(900px) rotateX(62deg) translateY(22vh);
+      transform-origin: center 65%;
+      opacity:.55;
+      filter: drop-shadow(0 0 16px rgba(34,211,238,.18));
+    }
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(900px 600px at 50% 40%, rgba(255,79,216,.18), transparent 60%),
+        radial-gradient(900px 600px at 30% 30%, rgba(34,211,238,.14), transparent 58%),
+        linear-gradient(180deg, rgba(0,0,0,.45), rgba(7,0,26,.92));
+      color: #e0e7ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 50;
+    }
+    .winner-card{
+      background: rgba(34,197,94,.28) !important;
+      border: 1px solid rgba(163,230,53,.35) !important;
+      box-shadow:
+        0 0 18px rgba(163,230,53,.22),
+        0 0 30px rgba(34,211,238,.10),
+        0 18px 30px rgba(0,0,0,.28) !important;
+      color: #eafff1 !important;
+    }
+    .neonTitle{
+      letter-spacing: .02em;
+      text-shadow:
+        0 0 10px rgba(34,211,238,.35),
+        0 0 20px rgba(255,79,216,.25),
+        0 0 36px rgba(168,85,247,.18);
+    }
+    .chrome{
+      background: linear-gradient(180deg, #f8fafc 0%, #dbeafe 18%, #93c5fd 35%, #f8fafc 55%, #cbd5e1 80%, #f8fafc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 12px rgba(34,211,238,.20));
+    }
+    @keyframes headerPulse {
+      0%, 100% { filter: drop-shadow(0 0 12px rgba(34,211,238,.20)); }
+      50% { filter: drop-shadow(0 0 24px rgba(34,211,238,.45)) drop-shadow(0 0 36px rgba(255,79,216,.25)); }
+    }
+    header .chrome { animation: headerPulse 2.5s ease-in-out infinite; }
+    .subGlow{ text-shadow: 0 0 10px rgba(34,211,238,.25); }
+    .glass{
+      background: var(--glass);
+      border: 1px solid rgba(34,211,238,.18);
+      box-shadow:
+        0 10px 30px rgba(0,0,0,.25),
+        0 0 18px rgba(255,79,216,.10);
+      backdrop-filter: blur(10px);
+    }
+    .glassStrong{
+      background: var(--glass2);
+      border: 1px solid rgba(255,79,216,.18);
+      box-shadow:
+        0 12px 34px rgba(0,0,0,.30),
+        0 0 22px rgba(34,211,238,.12);
+      backdrop-filter: blur(12px);
+    }
+    .neonBtn{
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
+      color: #fff;
+      font-weight: bold;
+    }
+    .neonBtn:hover:not(:disabled){
+      transform: translateY(-1px);
+      box-shadow:
+        0 14px 26px rgba(0,0,0,.22),
+        0 0 18px rgba(34,211,238,.18),
+        0 0 18px rgba(255,79,216,.12);
+      filter: saturate(1.15);
+    }
+    .neonBtn:active:not(:disabled){ transform: translateY(0px) scale(.99); }
+    .neonBtn:disabled{
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .neonPrimary{ background: linear-gradient(90deg, #22d3ee, #a855f7); }
+    .neonWarn{ background: linear-gradient(90deg, #ff4fd8, #ef4444); }
+    .neonGo{ background: linear-gradient(90deg, #a3e635, #22d3ee); }
+    .neonAlt{ background: linear-gradient(90deg, #60a5fa, #22d3ee); }
+    .matchCard{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow:
+        inset 0 0 0 1px rgba(34,211,238,.10),
+        0 10px 25px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
+    }
+    .matchCard .courtTitle{ text-shadow: 0 0 10px rgba(34,211,238,.18); }
+    .winner-button {
+      background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+      border: 2px solid rgba(34,197,94,.8) !important;
+      box-shadow: 0 0 15px rgba(163,230,53,.5) !important;
+      transform: scale(1.05) !important;
+      color: white !important;
+    }
+    .winter-text { font-family: 'Fredoka One', cursive; }
+    .winter-header { font-family: 'Righteous', cursive; }
+    .bold-text { font-family: 'Bungee', cursive; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-white relative">
+<div id="bgFX"></div>
+
+<header class="text-center py-6 relative z-10">
+  <h1 class="text-5xl font-extrabold winter-header neonTitle chrome" id="headerTitle">Eighties Lateies</h1>
+  <div class="text-center text-sm mt-1 text-cyan-200 subGlow">Synthwave Edition</div>
+</header>
+
+<div id="setupPanel" class="glassStrong p-6 rounded-lg max-w-4xl mx-auto mb-4 relative z-10">
+    <h3 class="text-2xl font-semibold mb-4 text-center winter-text subGlow">Tournament Setup</h3>
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <div>
+      <label class="block mb-1 winter-text text-cyan-200">Event Name</label>
+      <input type="text" id="eventName" value="Eighties Lateies" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" />
+    </div>
+    <div>
+      <label class="block mb-1 winter-text text-cyan-200">Number of Teams</label>
+      <input type="number" id="teamCount" value="12" min="4" max="14" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" onchange="renderTeamInputsDynamic()" />
+    </div>
+    <div>
+      <label class="block mb-1 winter-text text-cyan-200">Number of Courts</label>
+      <input type="number" id="courtCount" value="6" min="1" max="6" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" />
+    </div>
+    <div>
+      <label class="block mb-1 winter-text text-cyan-200">Number of Rounds (0 = Unlimited)</label>
+      <input type="number" id="totalRounds" value="11" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" />
+    </div>
+    <div>
+      <label class="block mb-1 winter-text text-cyan-200">Round Duration (minutes)</label>
+      <input type="number" id="roundDuration" value="15" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" />
+    </div>
+    <div>
+      <label class="block mb-1 winter-text text-cyan-200">Countdown Before Start (seconds)</label>
+      <input type="number" id="countdownDuration" value="90" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" />
+    </div>
+  </div>
+  <div class="mb-6 flex items-center gap-2">
+    <input type="checkbox" id="fullscreenToggle" class="w-5 h-5 accent-cyan-400" />
+    <label for="fullscreenToggle" class="text-lg winter-text text-cyan-200">Enable Full Screen Mode during rounds</label>
+  </div>
+  <h4 class="text-xl font-semibold mb-2 text-center winter-text text-cyan-300">Team Names</h4>
+  <div id="teamInputs" class="flex flex-wrap gap-2 justify-center mb-4"></div>
+  <div class="text-center">
+    <button onclick="createTournament()" class="neonBtn neonPrimary px-8 py-4 rounded-full font-bold text-xl">
+      Create Tournament
+    </button>
+  </div>
+</div>
+
+<main id="mainPanel" class="hidden flex flex-1 gap-6 px-6 relative z-10">
+  <div class="flex-1">
+    <div class="text-center text-5xl font-bold my-4 winter-text neonTitle text-cyan-300" id="timer">Ready?</div>
+    <div class="text-center space-x-3 mb-6">
+      <button id="prevBtn" onclick="previousRound()" class="neonBtn neonAlt px-4 py-2 rounded-full font-bold" disabled>Previous</button>
+      <button id="startBtn" onclick="startRound()" class="neonBtn neonPrimary px-4 py-2 rounded-full font-bold">Start Round</button>
+      <button id="nextBtn" onclick="nextRound()" class="neonBtn neonPrimary px-4 py-2 rounded-full font-bold" disabled>Next Round</button>
+      <button id="endBtn" onclick="confirmEndEvent()" class="neonBtn neonWarn px-4 py-2 rounded-full font-bold text-white">End Event</button>
+      <button id="shareBtn" class="neonBtn neonGo px-4 py-2 rounded-full font-bold text-white">Spectator QR Code</button>
+    </div>
+    <div id="roundStatus" class="text-center mb-4 text-lg winter-text text-yellow-300"></div>
+    <h2 class="text-2xl mb-4 winter-text text-cyan-300 subGlow" id="roundNumber">Round 0</h2>
+    <div id="courtGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <div id="byeTeams" class="mt-6 text-center"></div>
+  </div>
+  <div class="w-1/3 glassStrong p-4 rounded-lg">
+    <h2 class="text-2xl mb-2 winter-text text-cyan-300 subGlow">Leaderboard</h2>
+    <div id="leaderboard" class="space-y-2"></div>
+  </div>
+</main>
+
+<div id="countdownOverlay" class="overlay hidden text-[10rem] font-bold animate-bounce winter-text neonTitle">0</div>
+<div id="goOverlay" class="overlay hidden text-[12rem] font-bold winter-text neonTitle" style="color:#ff4fd8;">GO!</div>
+<div id="timerOverlay" class="overlay hidden">
+  <div id="bigTimer" class="text-[12rem] font-bold mb-12 neonTitle" style="color:#22d3ee;">00:00</div>
+  <button id="endRoundBtn" onclick="endRound()" class="neonBtn neonPrimary px-8 py-4 rounded-full text-4xl font-bold hidden">End Round</button>
+</div>
+<div id="winnerOverlay" class="overlay hidden flex-col text-center">
+  <h1 class="text-6xl font-bold mb-6 winter-text neonTitle">Champion: <span id="winnerName"></span></h1>
+  <div id="finalLeaderboard" class="text-3xl"></div>
+</div>
+<div id="qrOverlay" class="overlay hidden flex-col text-center">
+  <h2 class="text-3xl font-bold mb-4 winter-text neonTitle">Scan to View Spectator</h2>
+  <div id="qrCodeContainer" class="glass p-4 rounded-xl mb-4">
+    <img id="qrCodeImage" src="" alt="Spectator QR Code" class="w-64 h-64" />
+  </div>
+  <p class="mb-2 text-lg text-cyan-200 subGlow">Spectators scan this to watch live</p>
+  <button onclick="copySpectatorLink()" class="neonBtn neonAlt px-4 py-2 rounded-full font-bold">Copy Link</button>
+  <button onclick="document.getElementById('qrOverlay').classList.add('hidden')" class="mt-4 text-cyan-300 hover:text-cyan-200 underline">Close</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const isReadOnly = urlParams.get('view') === 'readonly';
+let eventId = urlParams.get('event') || null;
+
+let teams=[], leaderboard=[], matches=[], round=0, config={}, roundRobinSchedule=[];
+let timerInterval, timeLeft=0, inProgress=false;
+let roundStatus = "idle"; // idle, countdown, in_progress, completed
+let roundHistory = []; // Store matches for each round for going back
+let allSavedMatches = []; // Store all matches from database to preserve court assignments
+
+async function init() {
+  if (eventId) {
+    await loadEvent();
+    document.getElementById("setupPanel").classList.add("hidden");
+    document.getElementById("mainPanel").classList.remove("hidden");
+    document.title = event.name;
+    document.getElementById("headerTitle").textContent = event.name;
+    renderUI();
+    updateButtonStates();
+    if (isReadOnly) {
+      disableButtons();
+    }
+  } else {
+    renderTeamInputsDynamic();
+  }
+  document.getElementById('shareBtn').addEventListener('click',()=>{
+    if (!eventId) return;
+    const link=`${window.location.origin}/spectator.html?event=${eventId}`;
+    document.getElementById('qrCodeImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(link)}`;
+    document.getElementById('qrOverlay').classList.remove('hidden');
+  });
+}
+
+function copySpectatorLink() {
+  const link=`${window.location.origin}/spectator.html?event=${eventId}`;
+  navigator.clipboard.writeText(link).then(()=>alert('Link copied!'));
+}
+
+function disableButtons(){
+  document.querySelectorAll("button").forEach(b=>{
+    if(b.id!=="shareBtn") b.disabled=true;
+  });
+}
+
+function renderTeamInputsDynamic(){
+  const count=parseInt(document.getElementById("teamCount").value);
+  const container=document.getElementById("teamInputs");
+  container.innerHTML="";
+  const winterNames = ["Every Dink You Take", "The Karate Dinks", "Hit Me With Your Best Shot", "My Little Pony", "Purple Pain", "Sweet Dinks are Made of These", "Ghostbusters", "Weekend at Ernies", "Rolling Dinks", "Cyndi Lobbers", "O-O Yeah!", "Lob Bamba"];
+  for(let i=0;i<count;i++){
+    const defaultValue = winterNames[i] || `Team ${i+1}`;
+    container.innerHTML+=`<input type="text" id="teamInput${i}" value="${defaultValue}" class="p-2 rounded text-black text-sm border-2 border-cyan-400 focus:border-cyan-300 winter-text min-w-[140px] max-w-[220px]">`;
+  }
+}
+
+async function createTournament(){
+  const eventName=document.getElementById("eventName").value||"Pickleball Event";
+  config={
+    teamCount:parseInt(document.getElementById("teamCount").value),
+    courtCount:parseInt(document.getElementById("courtCount").value),
+    totalRounds:parseInt(document.getElementById("totalRounds").value),
+    roundDuration:parseInt(document.getElementById("roundDuration").value),
+    countdownDuration:parseInt(document.getElementById("countdownDuration").value)
+  };
+  teams=[];for(let i=0;i<config.teamCount;i++){teams.push(document.getElementById(`teamInput${i}`).value||`Team ${i+1}`);}
+  leaderboard=teams.map(n=>({name:n,wins:0}));
+  round=0;
+  roundStatus = "idle";
+  roundHistory = [];
+  roundRobinSchedule=createRoundRobinSchedule(teams);
+  const res=await fetch("/.netlify/functions/save-event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:eventName,config,round,status:"idle",teams:leaderboard})});
+  const data=await res.json();eventId=data.eventId;
+  round=1;
+  let firstMatches = roundRobinSchedule[0] || [];
+  matches = assignCourtsToMatches(firstMatches, config.courtCount);
+  // Add round number to each match
+  matches.forEach(m => m.round = round);
+  allSavedMatches = JSON.parse(JSON.stringify(matches));
+  await saveEvent({round,status:"idle",matches});
+  history.replaceState(null,"",`?event=${eventId}`);
+  document.title = eventName;
+  document.getElementById("headerTitle").textContent = eventName;
+  document.getElementById("setupPanel").classList.add("hidden");
+  document.getElementById("mainPanel").classList.remove("hidden");
+  renderUI();
+  updateButtonStates();
+}
+
+function createRoundRobinSchedule(teamList){
+  // Standard round-robin: each team plays every other team exactly once
+  // Uses circle method where position 0 is fixed and others rotate
+  const arr=[...teamList];
+  if(arr.length%2!==0) arr.push("BYE");
+  const n=arr.length, rounds=n-1, half=n/2, schedule=[];
+  
+  for(let r=0;r<rounds;r++){
+    const roundMatches=[];
+    for(let i=0;i<half;i++){
+      const t1=arr[i], t2=arr[n-1-i];
+      if(t1!=="BYE" && t2!=="BYE") {
+        roundMatches.push({team1:t1, team2:t2, winner:null});
+      }
+    }
+    schedule.push(roundMatches);
+    // Rotate: keep first element fixed, rotate the rest
+    arr.splice(1,0,arr.pop());
+  }
+  return schedule;
+}
+
+function shuffleArray(array) {
+  // Fisher-Yates shuffle for true randomization
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function assignCourtsToMatches(matchList, courtCount) {
+  // Randomly assign courts to ALL matches; court labels are always 1..N
+  const courtNumbers = Array.from({length: courtCount}, (_, i) => i + 1);
+  
+  // Shuffle the matches themselves so team order is random
+  const shuffledMatches = shuffleArray([...matchList]);
+  
+  // Shuffle courts and assign
+  const shuffledCourts = shuffleArray(courtNumbers);
+  
+  return shuffledMatches.map((match, index) => ({
+    ...match,
+    court: shuffledCourts[index % courtCount]
+  }));
+}
+
+function getHeadToHeadResult(team1, team2) {
+  // Returns 1 if team1 beat team2, -1 if team2 beat team1, 0 if no head-to-head or tie
+  const allMatches = roundRobinSchedule.flat();
+  for (const match of allMatches) {
+    if ((match.team1 === team1 && match.team2 === team2) || 
+        (match.team1 === team2 && match.team2 === team1)) {
+      if (match.winner === team1) return 1;
+      if (match.winner === team2) return -1;
+      return 0; // No winner yet or tie
+    }
+  }
+  return 0; // No head-to-head match found
+}
+
+function canStartRound() {
+  // Can only start if we're in idle state
+  if (roundStatus !== "idle") return false;
+  // For round > 1, check that previous round has all winners entered
+  // (This is checked when transitioning to next round, so if we're idle, we're good)
+  return true;
+}
+
+function allWinnersEntered() {
+  // Check if all current matches have winners
+  const activeMatches = matches.slice(0, config.courtCount);
+  return activeMatches.every(m => m.winner !== null);
+}
+
+function canGoToNextRound() {
+  // Must have completed the round (played it) AND all winners must be entered
+  if (roundStatus !== "completed") return false;
+  if (!allWinnersEntered()) return false;
+  // Check if there are more rounds in the schedule
+  if (round >= roundRobinSchedule.length) return false;
+  return true;
+}
+
+function canGoToPreviousRound() {
+  return round > 1 && roundHistory.length > 0;
+}
+
+async function startRound() {
+  if (!canStartRound()) {
+    if (roundStatus === "completed") {
+      alert("Round already played! Enter winners and click 'Next Round' to continue.");
+    } else if (roundStatus === "in_progress") {
+      alert("Round is already in progress!");
+    }
+    return;
+  }
+  
+  roundStatus = "countdown";
+  updateButtonStates();
+  showOverlay("countdownOverlay");
+  const now = new Date().toISOString();
+  await saveEvent({ status: "countdown", countdown_start: now });
+  let countdown = config.countdownDuration;
+  document.getElementById("countdownOverlay").textContent = countdown;
+  const countdownInterval = setInterval(() => {
+    countdown--;
+    document.getElementById("countdownOverlay").textContent = countdown;
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      hideOverlays();
+      showOverlay("goOverlay");
+      setTimeout(() => {
+        hideOverlays();
+        beginTimer();
+      }, 2000);
+    }
+  }, 1000);
+}
+
+
+async function beginTimer(){
+  inProgress=true;
+  roundStatus = "in_progress";
+  updateButtonStates();
+  timeLeft=config.roundDuration*60;
+  await saveEvent({status:"in_progress",current_round_start:new Date().toISOString()});
+  showOverlay("timerOverlay");
+  document.getElementById("endRoundBtn").classList.remove("hidden");
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    if(timeLeft<=0){endRound();}
+    document.getElementById("bigTimer").textContent=formatTime(timeLeft);
+    timeLeft--;
+  },1000);
+}
+
+async function endRound(){
+  clearInterval(timerInterval);
+  inProgress=false;
+  roundStatus = "completed";
+  hideOverlays();
+  document.getElementById("timer").textContent="Enter Winners";
+  await saveEvent({status:"completed"});
+  updateButtonStates();
+}
+
+function updateButtonStates() {
+  const startBtn = document.getElementById("startBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const statusDiv = document.getElementById("roundStatus");
+  
+  // Start button - only enabled in idle state
+  if (canStartRound()) {
+    startBtn.disabled = false;
+    startBtn.classList.remove("opacity-50");
+  } else {
+    startBtn.disabled = true;
+    startBtn.classList.add("opacity-50");
+  }
+  
+  // Next button - only enabled after round completed AND all winners entered
+  if (canGoToNextRound()) {
+    nextBtn.disabled = false;
+    nextBtn.classList.remove("opacity-50");
+  } else {
+    nextBtn.disabled = true;
+    nextBtn.classList.add("opacity-50");
+  }
+  
+  // Previous button - only enabled if there's history
+  if (canGoToPreviousRound()) {
+    prevBtn.disabled = false;
+    prevBtn.classList.remove("opacity-50");
+  } else {
+    prevBtn.disabled = true;
+    prevBtn.classList.add("opacity-50");
+  }
+  
+  // Status message
+  let statusMsg = "";
+  if (roundStatus === "idle") {
+    statusMsg = "📋 Ready to start round";
+  } else if (roundStatus === "countdown") {
+    statusMsg = "⏳ Countdown in progress...";
+  } else if (roundStatus === "in_progress") {
+    statusMsg = "Round in progress...";
+  } else if (roundStatus === "completed") {
+    if (!allWinnersEntered()) {
+      const missing = matches.slice(0, config.courtCount).filter(m => !m.winner).length;
+      statusMsg = `⚠️ Enter ${missing} winner(s) to continue`;
+    } else {
+      statusMsg = "✅ All winners entered! Click 'Next Round' to continue";
+    }
+  }
+  statusDiv.textContent = statusMsg;
+}
+
+async function nextRound(){
+  if (!canGoToNextRound()) {
+    if (roundStatus !== "completed") {
+      alert("You must play the round first! Click 'Start Round'.");
+    } else if (!allWinnersEntered()) {
+      alert("Please enter all match winners before proceeding.");
+    }
+    return;
+  }
+  
+  // Save current round state to history before moving on
+  roundHistory.push({
+    round: round,
+    matches: JSON.parse(JSON.stringify(matches)),
+    leaderboard: JSON.parse(JSON.stringify(leaderboard))
+  });
+  
+  round++;
+  roundStatus = "idle";
+  
+  // Check if we have saved matches for this round (preserves court assignments)
+  const savedMatchesForRound = allSavedMatches.filter(m => m.round === round);
+  if (savedMatchesForRound.length > 0) {
+    // Use saved matches to preserve court assignments
+    matches = JSON.parse(JSON.stringify(savedMatchesForRound));
+  } else {
+    // Brand new round - create matches and randomize courts once
+    let nextMatches = roundRobinSchedule[round - 1] || [];
+    matches = assignCourtsToMatches(nextMatches, config.courtCount);
+    // Add round number to each match and add to allSavedMatches so they're preserved
+    matches.forEach(m => m.round = round);
+    allSavedMatches.push(...JSON.parse(JSON.stringify(matches)));
+  }
+  
+  document.getElementById("timer").textContent="Ready?";
+  await saveEvent({round, status:"idle", matches, teams: leaderboard});
+  renderUI();
+  updateButtonStates();
+}
+
+async function previousRound() {
+  if (!canGoToPreviousRound()) {
+    alert("Cannot go back - no previous round available.");
+    return;
+  }
+  
+  // Restore previous round state
+  const prevState = roundHistory.pop();
+  round = prevState.round;
+  matches = JSON.parse(JSON.stringify(prevState.matches));
+  
+  // Update allSavedMatches to reflect the restored round
+  allSavedMatches = allSavedMatches.filter(m => m.round !== round);
+  allSavedMatches.push(...JSON.parse(JSON.stringify(matches)));
+  
+  // If we have stored leaderboard, use it; otherwise recalculate
+  if (prevState.leaderboard) {
+    leaderboard = JSON.parse(JSON.stringify(prevState.leaderboard));
+  } else {
+    // Recalculate leaderboard from all matches up to this round
+    recalculateLeaderboard();
+  }
+  
+  roundStatus = "completed"; // Set to completed so they can edit winners
+  
+  // Also restore winners in roundRobinSchedule
+  for (const match of matches) {
+    updateRoundRobinScheduleMatch(match.team1, match.team2, match.winner);
+  }
+  
+  document.getElementById("timer").textContent="Enter Winners";
+  await saveEvent({round, status:"completed", matches, teams: leaderboard});
+  renderUI();
+  updateButtonStates();
+}
+
+function recalculateLeaderboard() {
+  // Reset all wins to 0
+  leaderboard.forEach(t => t.wins = 0);
+  
+  // Count wins from roundRobinSchedule
+  const allMatches = roundRobinSchedule.flat();
+  for (const match of allMatches) {
+    if (match.winner) {
+      const team = leaderboard.find(t => t.name === match.winner);
+      if (team) team.wins++;
+    }
+  }
+}
+
+function confirmEndEvent() {
+  if (confirm("Are you sure you want to end the event? This action cannot be undone.")) {
+    endEvent();
+  }
+}
+
+async function endEvent() {
+  // Sort leaderboard with proper tie-breaking
+  leaderboard.sort((a, b) => {
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    // If wins are equal, use head-to-head
+    return getHeadToHeadResult(b.name, a.name);
+  });
+
+  await saveEvent({ status: "event_done" });
+  showWinnerOverlay();
+}
+
+    function showWinnerOverlay() {
+      hideOverlays();
+      const winner = leaderboard[0].name;
+      document.getElementById("winnerName").textContent = winner;
+      const lb = document.getElementById("finalLeaderboard");
+      lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
+      showOverlay("winnerOverlay");
+      launchConfetti();
+    }
+
+    function launchConfetti() {
+      const duration = 4000, end = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999, colors: ['#22d3ee', '#f72585', '#a855f7', '#a3e635', '#60a5fa'] };
+      const interval = setInterval(() => {
+        const timeLeft = end - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({ ...defaults, particleCount, origin: { x: Math.random() * 0.5, y: Math.random() - 0.2 } });
+        confetti({ ...defaults, particleCount, origin: { x: Math.random() * 0.5 + 0.5, y: Math.random() - 0.2 } });
+      }, 250);
+    }
+
+async function recordWin(index,teamName){
+  if(isReadOnly)return;
+  const match=matches[index];
+  
+  // If clicking the same team that already won, clear the selection
+  if(match.winner === teamName) {
+    const prevTeam = leaderboard.find(t => t.name === match.winner);
+    if(prevTeam) prevTeam.wins--;
+    match.winner = null;
+    // Also update roundRobinSchedule
+    updateRoundRobinScheduleMatch(match.team1, match.team2, null);
+  } else {
+    // Remove previous winner's win if there was one
+    if(match.winner) {
+      const prevTeam = leaderboard.find(t => t.name === match.winner);
+      if(prevTeam) prevTeam.wins--;
+    }
+    // Set new winner
+    match.winner = teamName;
+    const team = leaderboard.find(t => t.name === teamName);
+    if(team) team.wins++;
+    // Also update roundRobinSchedule
+    updateRoundRobinScheduleMatch(match.team1, match.team2, teamName);
+  }
+  
+  // Update allSavedMatches to keep it in sync
+  const matchIndex = allSavedMatches.findIndex(m => 
+    m.round === round && 
+    ((m.team1 === match.team1 && m.team2 === match.team2) || 
+     (m.team1 === match.team2 && m.team2 === match.team1))
+  );
+  if (matchIndex !== -1) {
+    allSavedMatches[matchIndex] = {...match};
+  }
+  
+  await saveEvent({matches, teams: leaderboard});
+  renderUI();
+  updateButtonStates();
+}
+
+function updateRoundRobinScheduleMatch(team1, team2, winner) {
+  // Update the corresponding match in roundRobinSchedule with the winner
+  const allMatches = roundRobinSchedule.flat();
+  for (const match of allMatches) {
+    if ((match.team1 === team1 && match.team2 === team2) || 
+        (match.team1 === team2 && match.team2 === team1)) {
+      match.winner = winner;
+      break;
+    }
+  }
+}
+
+async function saveEvent(extra={}){
+  await fetch("/.netlify/functions/save-event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({eventId,name:document.title,config,round,...extra,teams:leaderboard,matches})});
+}
+
+async function loadEvent(){
+  const res=await fetch(`/.netlify/functions/load-event?event=${eventId}`);
+  if(res.ok){
+    const data=await res.json();window.event=data.event;
+    leaderboard=data.teams.map(t=>({name:t.name,wins:t.wins}));
+    teams = data.teams.map(t => t.name); // Recreate teams array
+    round=data.event.round;config=data.event.config;
+    
+    // Store all saved matches to preserve court assignments
+    allSavedMatches = data.matches || [];
+    matches = allSavedMatches.filter(m=>m.round===round);
+    
+    // Set roundStatus based on loaded event status
+    const loadedStatus = data.event.status;
+    if (loadedStatus === "idle" || loadedStatus === "countdown" || loadedStatus === "in_progress" || loadedStatus === "completed") {
+      roundStatus = loadedStatus;
+    } else {
+      roundStatus = "idle";
+    }
+    
+    // Recreate roundRobinSchedule from loaded teams
+    roundRobinSchedule = createRoundRobinSchedule(teams);
+    // Update roundRobinSchedule with winners from all loaded matches
+    for (const loadedMatch of allSavedMatches) {
+      if (loadedMatch.winner) {
+        updateRoundRobinScheduleMatch(loadedMatch.team1, loadedMatch.team2, loadedMatch.winner);
+      }
+    }
+    
+    // Rebuild round history from previous rounds
+    roundHistory = [];
+    for (let r = 1; r < round; r++) {
+      const roundMatches = allSavedMatches.filter(m => m.round === r);
+      if (roundMatches.length > 0) {
+        // Calculate leaderboard state at that round (simplified - just track it was played)
+        roundHistory.push({
+          round: r,
+          matches: roundMatches,
+          leaderboard: null // We can't fully reconstruct, but we have match data
+        });
+      }
+    }
+    
+    updateButtonStates();
+  }
+}
+
+function showOverlay(id){document.getElementById(id).classList.remove("hidden");}
+function hideOverlays(){document.querySelectorAll(".overlay").forEach(el=>el.classList.add("hidden"));}
+function renderUI(){
+  document.getElementById("roundNumber").textContent=`Round ${round} of ${config.totalRounds||"∞"}`;
+  const lb=document.getElementById("leaderboard");lb.innerHTML="";
+  // Sort leaderboard with proper tie-breaking
+  leaderboard.sort((a,b) => {
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    // If wins are equal, use head-to-head
+    return getHeadToHeadResult(b.name, a.name);
+  }).forEach(t=>lb.innerHTML+=`<div class="flex justify-between text-sm gap-2"><span class="truncate min-w-0">${t.name}</span><span class="shrink-0">${t.wins}</span></div>`);
+  const grid=document.getElementById("courtGrid");grid.innerHTML="";
+  const courts=config.courtCount||3;
+  const displayedMatches = matches.slice(0, courts);
+  displayedMatches.forEach((m,i)=>{
+    const winnerClass=m.winner?'winner-card':'winter-card';
+    const courtLabel = i + 1; // Court 1..N always
+    const team1Escaped = m.team1.replace(/'/g, "\\'");
+    const team2Escaped = m.team2.replace(/'/g, "\\'");
+    grid.innerHTML+=`<div class="matchCard rounded-lg p-4 text-center ${winnerClass} text-white">
+      <div class="courtTitle font-bold mb-2 winter-text text-lg">Court ${courtLabel}</div>
+      <div class="text-sm font-semibold leading-tight">${m.team1} vs ${m.team2}</div>
+      <div class="mt-2 winter-text text-sm">Winner: ${m.winner||'TBD'}</div>
+      ${!isReadOnly?`<div class="mt-2 flex flex-wrap gap-1 justify-center">
+        <button onclick="recordWin(${i},'${team1Escaped}')" class="neonBtn neonAlt px-2 py-1 rounded-full text-xs leading-tight text-center ${m.winner === m.team1 ? 'winner-button' : ''}">${m.team1}</button>
+        <button onclick="recordWin(${i},'${team2Escaped}')" class="neonBtn neonAlt px-2 py-1 rounded-full text-xs leading-tight text-center ${m.winner === m.team2 ? 'winner-button' : ''}">${m.team2}</button>
+      </div>`:''}
+    </div>`;
+  });
+  const byeTeamsElement=document.getElementById("byeTeams");
+  const byeTeamsList = teams.filter(team => !displayedMatches.flatMap(m => [m.team1, m.team2]).includes(team));
+  if (byeTeamsList.length > 0) {
+    byeTeamsElement.innerHTML = `<div class="winter-text text-cyan-300 text-xl subGlow">BYE: ${byeTeamsList.join(", ")}</div>`;
+  } else {
+    byeTeamsElement.textContent = "";
+  }
+}
+function formatTime(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return `${m}:${sec<10?"0":""}${sec}`;}
+init();
+</script>
+</body>
+</html>

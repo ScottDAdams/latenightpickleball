@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@netlify/neon": "^0.1.0",
+    "netlify": "^22.4.0"
+  }
+}
