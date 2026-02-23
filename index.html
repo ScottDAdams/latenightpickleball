@@ -369,6 +369,7 @@
   <h1 class="text-6xl font-bold mb-6 winter-text neonTitle">Champion: <span id="winnerName"></span></h1>
   <p id="winnerSubtitle" class="text-xl text-cyan-200 mb-4"></p>
   <div id="finalLeaderboard" class="text-3xl"></div>
+  <p id="championRationale" class="mt-6 text-base text-cyan-200/95 max-w-xl mx-auto px-4"></p>
 </div>
 <div id="qrOverlay" class="overlay hidden flex-col text-center">
   <h2 class="text-3xl font-bold mb-4 winter-text neonTitle">Scan to View Spectator</h2>
@@ -993,12 +994,36 @@ function showWinnerOverlay() {
     if (subEl) subEl.textContent = "";
   }
   const lb = document.getElementById("finalLeaderboard");
+  const rationaleEl = document.getElementById("championRationale");
+  if (rationaleEl) rationaleEl.textContent = "";
   lb.classList.remove("finalLeaderboard-cols-2", "finalLeaderboard-cols-3");
   if (showTop3) {
     var sorted = leaderboard.slice().sort(function (a, b) {
       if (b.wins !== a.wins) return b.wins - a.wins;
       return getHeadToHeadResult(b.name, a.name);
     });
+    var first = sorted[0], second = sorted[1], third = sorted[2];
+    var tied1and2 = first && second && first.wins === second.wins;
+    var tied2and3 = second && third && second.wins === third.wins;
+    var parts = [];
+    function formatList(names) { return names.length === 1 ? names[0] : names.slice(0, -1).join(", ") + " and " + names[names.length - 1]; }
+    if (rationaleEl && (tied1and2 || tied2and3)) {
+      if (tied1and2 && first) {
+        var tiedWithFirst = [second].concat(tied2and3 && third ? [third] : []).filter(function (t) { return t && t.wins === first.wins; });
+        var firstBeat = tiedWithFirst.filter(function (t) { return getHeadToHeadResult(first.name, t.name) === 1; }).map(function (t) { return t.name; });
+        if (firstBeat.length)
+          parts.push("1st: " + first.name + " — beat " + formatList(firstBeat) + " (head-to-head).");
+        else
+          parts.push("1st: " + first.name + " (tied on " + first.wins + " wins with " + formatList(tiedWithFirst.map(function (t) { return t.name; })) + "; no head-to-head).");
+      }
+      if (tied2and3 && second && third) {
+        if (getHeadToHeadResult(second.name, third.name) === 1)
+          parts.push("2nd: " + second.name + " — beat " + third.name + " (head-to-head).");
+        else
+          parts.push("2nd: " + second.name + " (tied on " + second.wins + " wins with " + third.name + "; no head-to-head).");
+      }
+      rationaleEl.textContent = parts.join(" ");
+    }
     lb.innerHTML = sorted.map(function (t, i) {
       var isTop3 = i < 3;
       var rowClass = isTop3 ? " top3-row" : "";
