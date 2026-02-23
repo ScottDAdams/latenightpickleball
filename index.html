@@ -89,6 +89,14 @@
     body.highlander #winnerOverlay{
       background: radial-gradient(ellipse 100% 100% at 50% 30%, #1e293b 0%, #0f172a 40%, #020617 100%);
     }
+    #winnerOverlay{
+      padding: 1rem; box-sizing: border-box; overflow: auto;
+      justify-content: center; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+    }
+    #winnerOverlay h1{ font-size: clamp(1.5rem, 6vw, 3.75rem); margin-bottom: clamp(0.5rem, 2vw, 1.5rem); line-height: 1.2; }
+    #winnerOverlay #winnerName{ display: block; font-size: clamp(1.25rem, 5vw, 3rem); margin-top: 0.25em; }
+    #winnerOverlay #winnerSubtitle{ font-size: clamp(0.875rem, 2.5vw, 1.25rem); margin-bottom: clamp(0.5rem, 1.5vw, 1rem); }
+    #winnerOverlay #finalLeaderboard{ font-size: clamp(0.875rem, 2vw, 1.875rem); max-height: 40vh; overflow: auto; }
     body.highlander #winnerOverlay .winner-name-cinematic{
       background: linear-gradient(180deg, #fef3c7, #f59e0b);
       -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -122,25 +130,25 @@
       color: #d1fae5 !important;
       box-shadow: 0 0 14px rgba(34,197,94,.35) !important;
     }
-    /* Background-only lightning: soft glow behind content (z-index 0), never over UI */
+    /* Lightning: visible layer above bg (z-5) but below main UI (z-10); animation forced in JS */
     @keyframes lightningBgFlash {
       0%, 100% { opacity: 0; }
-      15% { opacity: 0.4; }
-      30% { opacity: 0; }
+      20% { opacity: 0.7; }
+      40% { opacity: 0; }
     }
     @keyframes lightningBgFlashChampion {
       0%, 100% { opacity: 0; }
-      12% { opacity: 0.5; }
-      25% { opacity: 0.15; }
-      45% { opacity: 0; }
+      15% { opacity: 0.85; }
+      35% { opacity: 0.25; }
+      55% { opacity: 0; }
     }
     #lightningBgGlow{
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background: radial-gradient(ellipse 120% 80% at 50% 20%, rgba(134,239,212,.5) 0%, rgba(94,234,212,.25) 25%, rgba(34,211,238,.12) 50%, transparent 70%);
+      position: fixed; inset: 0; pointer-events: none; z-index: 5;
+      background: radial-gradient(ellipse 140% 90% at 50% 15%, rgba(134,239,212,.7) 0%, rgba(94,234,212,.4) 30%, rgba(34,211,238,.2) 55%, transparent 75%);
       opacity: 0;
     }
-    #lightningBgGlow.on{ animation: lightningBgFlash 0.25s ease-out; }
-    #lightningBgGlow.champion{ animation: lightningBgFlashChampion 0.6s ease-out; }
+    #lightningBgGlow.on{ animation: lightningBgFlash 0.3s ease-out forwards; }
+    #lightningBgGlow.champion{ animation: lightningBgFlashChampion 0.7s ease-out forwards; }
     #bgFX{
       position: fixed;
       inset: 0;
@@ -967,9 +975,16 @@ function triggerLightningFlash(kind) {
   const el = document.getElementById("lightningBgGlow");
   if (!el) return;
   el.classList.remove("on", "champion");
+  el.style.animation = "none";
   el.offsetHeight;
-  el.classList.add(kind === "champion" ? "champion" : "on");
-  setTimeout(() => { el.classList.remove("on", "champion"); }, kind === "champion" ? 600 : 250);
+  el.style.animation = "";
+  requestAnimationFrame(function () {
+    el.classList.add(kind === "champion" ? "champion" : "on");
+    var duration = kind === "champion" ? 700 : 300;
+    setTimeout(function () {
+      el.classList.remove("on", "champion");
+    }, duration);
+  });
 }
 
 function playStormRumble() {
@@ -1001,17 +1016,18 @@ function showWinnerOverlay() {
     nameEl.textContent = leaderboard[0] ? leaderboard[0].name : "";
     if (subEl) subEl.textContent = "";
   }
+  const lb = document.getElementById("finalLeaderboard");
+  lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
   if (isHighlander) {
     nameEl.classList.add("winner-name-cinematic");
     triggerLightningFlash("champion");
     playStormRumble();
+    setTimeout(function () { showOverlay("winnerOverlay"); }, 450);
   } else {
     nameEl.classList.remove("winner-name-cinematic");
     launchConfetti();
+    showOverlay("winnerOverlay");
   }
-  const lb = document.getElementById("finalLeaderboard");
-  lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
-  showOverlay("winnerOverlay");
 }
 
     function launchConfetti() {
