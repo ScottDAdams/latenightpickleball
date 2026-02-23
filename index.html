@@ -96,7 +96,9 @@
     #winnerOverlay h1{ font-size: clamp(1.5rem, 6vw, 3.75rem); margin-bottom: clamp(0.5rem, 2vw, 1.5rem); line-height: 1.2; }
     #winnerOverlay #winnerName{ display: block; font-size: clamp(1.25rem, 5vw, 3rem); margin-top: 0.25em; }
     #winnerOverlay #winnerSubtitle{ font-size: clamp(0.875rem, 2.5vw, 1.25rem); margin-bottom: clamp(0.5rem, 1.5vw, 1rem); }
-    #winnerOverlay #finalLeaderboard{ font-size: clamp(0.875rem, 2vw, 1.875rem); max-height: 40vh; overflow: auto; }
+    #winnerOverlay #finalLeaderboard{ font-size: clamp(0.875rem, 2vw, 1.875rem); max-height: 50vh; overflow: auto; }
+    #winnerOverlay #finalLeaderboard.finalLeaderboard-cols-2{ column-count: 2; column-gap: 2rem; column-fill: balance; }
+    #winnerOverlay #finalLeaderboard.finalLeaderboard-cols-3{ column-count: 3; column-gap: 1.5rem; column-fill: balance; }
     body.highlander #winnerOverlay .winner-name-cinematic{
       background: linear-gradient(180deg, #fef3c7, #f59e0b);
       -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -474,6 +476,8 @@ async function init() {
     document.getElementById('qrCodeImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(link)}`;
     document.getElementById('qrOverlay').classList.remove('hidden');
   });
+  var stormToggle = document.getElementById('stormSoundToggle');
+  if (stormToggle) stormToggle.addEventListener('change', function() { if (config && config.mode === 'random_pairs') config.stormSound = this.checked; });
 }
 
 function copySpectatorLink() {
@@ -735,7 +739,16 @@ async function startRound() {
 }
 
 
+function playRoundStartSound() {
+  try {
+    var a = new Audio("onlyone.m4a");
+    a.volume = 1.0;
+    a.play().catch(function () {});
+  } catch (_) {}
+}
+
 async function beginTimer(){
+  playRoundStartSound();
   inProgress=true;
   roundStatus = "in_progress";
   updateButtonStates();
@@ -990,17 +1003,23 @@ function triggerLightningFlash(kind) {
 function playStormRumble() {
   if (!config.stormSound) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.15));
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    const gain = ctx.createGain();
-    gain.gain.value = 0.08;
-    src.connect(gain);
-    gain.connect(ctx.destination);
-    src.start(0);
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    function play() {
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.2));
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const gain = ctx.createGain();
+      gain.gain.value = 0.22;
+      src.connect(gain);
+      gain.connect(ctx.destination);
+      src.start(0);
+    }
+    if (ctx.state === "suspended") ctx.resume().then(play).catch(function () {});
+    else play();
   } catch (_) {}
 }
 
@@ -1017,6 +1036,9 @@ function showWinnerOverlay() {
     if (subEl) subEl.textContent = "";
   }
   const lb = document.getElementById("finalLeaderboard");
+  lb.classList.remove("finalLeaderboard-cols-2", "finalLeaderboard-cols-3");
+  if (leaderboard.length > 16) lb.classList.add("finalLeaderboard-cols-3");
+  else if (leaderboard.length > 8) lb.classList.add("finalLeaderboard-cols-2");
   lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
   if (isHighlander) {
     nameEl.classList.add("winner-name-cinematic");
@@ -1157,6 +1179,8 @@ async function loadEvent(){
     }
     updateButtonStates();
     updateHeaderForMode();
+    var stormToggle = document.getElementById('stormSoundToggle');
+    if (stormToggle && config.mode === 'random_pairs') stormToggle.checked = !!config.stormSound;
     if (loadedStatus === "event_done") showWinnerOverlay();
   }
 }
