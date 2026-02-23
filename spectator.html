@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spectator View</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./pairing.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Righteous&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -24,6 +25,35 @@
                   radial-gradient(1000px 700px at 20% 20%, rgba(34,211,238,.18), transparent 55%),
                   linear-gradient(135deg, var(--bg1), var(--bg2) 55%, #2d0a55 75%, #12002a);
       overflow-x:hidden;
+    }
+    body.highlander{
+      background: url("https://www.inspiringtravelscotland.com/wp-content/uploads/2019/05/Quiraing-Skye-Scottish-Highlands.jpg") center/cover no-repeat fixed,
+        radial-gradient(ellipse 100% 80% at 50% 0%, rgba(30,41,59,.85) 0%, rgba(15,23,42,.9) 35%, rgba(12,18,34,.92) 60%, rgba(2,6,23,.95) 100%);
+    }
+    body.highlander::before{
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,.4) 100%);
+      opacity: .9;
+    }
+    body.highlander header h1{
+      background: linear-gradient(180deg, #fef3c7 0%, #f59e0b 50%, #92400e 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      letter-spacing: .08em;
+      filter: drop-shadow(0 0 20px rgba(245,158,11,.35));
+    }
+    body.highlander header .header-sub{ text-transform: uppercase; letter-spacing: .25em; color: #94a3b8; font-size: .85rem; }
+    body.highlander .matchCard{
+      background: rgba(30,41,59,.75);
+      border: 1px solid rgba(212,175,55,.25);
+      box-shadow: 0 0 20px rgba(212,175,55,.08);
+    }
+    body.highlander .matchCard .courtTitle{ color: #fcd34d; font-variant: small-caps; }
+    body.highlander #leaderboard{ border-top: 1px solid rgba(212,175,55,.2); }
+    body.highlander #winnerOverlay #winnerName{
+      background: linear-gradient(180deg, #fef3c7, #f59e0b);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-transform: uppercase; letter-spacing: .1em;
+      filter: drop-shadow(0 0 24px rgba(245,158,11,.5));
     }
     #bgFX{
       position: fixed;
@@ -148,7 +178,7 @@
 <div id="bgFX"></div>
 <header class="text-center py-6 relative z-10">
   <h1 class="text-5xl font-extrabold winter-header neonTitle chrome" id="eventTitle">Spectator View</h1>
-  <div class="text-center text-sm mt-1 text-cyan-200 subGlow">Synthwave Edition</div>
+  <div class="text-center text-sm mt-1 text-cyan-200 subGlow header-sub" id="headerSub">Synthwave Edition</div>
 </header>
 
 <main id="mainPanel" class="flex flex-1 gap-6 px-6 relative z-10">
@@ -174,7 +204,8 @@
 
 <div id="winnerOverlay" class="overlay hidden text-center">
   <h1 class="text-5xl font-bold mb-4 winter-text neonTitle">Champion!</h1>
-  <div id="winnerName" class="text-6xl font-extrabold mb-6 frost-text neonTitle"></div>
+  <div id="winnerName" class="text-6xl font-extrabold mb-2 frost-text neonTitle"></div>
+  <div id="winnerSubtitle" class="text-xl winter-text text-cyan-200 mb-6"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -185,10 +216,7 @@ let leaderboard=[], matches=[], config={}, eventName="", round=0;
 let currentStatus="idle", timerInterval=null;
 
 function getHeadToHeadResult(team1, team2) {
-  // Returns 1 if team1 beat team2, -1 if team2 beat team1, 0 if no head-to-head or tie
-  // Note: spectator view doesn't have access to roundRobinSchedule, so we'll use a simpler approach
-  // This is a simplified version - in practice, you'd need to load all matches from the database
-  return 0; // For now, just return 0 (no tie-breaking in spectator view)
+  return 0;
 }
 
 async function init(){
@@ -209,7 +237,17 @@ async function loadEvent(){
   round = event.round;
 
   document.title = `Spectator View - ${eventName}`;
-  document.getElementById("eventTitle").textContent = `Spectator View - ${eventName}`;
+  if (config.mode === "random_pairs") {
+    document.body.classList.add("highlander");
+    document.getElementById("eventTitle").textContent = "Highlander Pickleball";
+    const sub = document.getElementById("headerSub");
+    if (sub) sub.textContent = "THERE CAN BE ONLY ONE";
+  } else {
+    document.body.classList.remove("highlander");
+    document.getElementById("eventTitle").textContent = `Spectator View - ${eventName}`;
+    const sub = document.getElementById("headerSub");
+    if (sub) sub.textContent = "Synthwave Edition";
+  }
   renderUI();
 
   if (event.status !== currentStatus) {
@@ -300,25 +338,52 @@ function renderUI() {
   const courts = config.courtCount || 3;
   const playingMatches = matches.slice(0, courts);
 
+  let byeNames = [];
+  if (config.mode === "random_pairs" && Array.isArray(config.players) && config.players.length > 0) {
+    const playingIds = new Set();
+    playingMatches.forEach(m => {
+      [m.team1, m.team2].forEach(label => {
+        PAIRING.parsePairLabel(label).forEach(name => {
+          const p = config.players.find(pl => pl.name === name);
+          if (p && p.id) playingIds.add(p.id);
+        });
+      });
+    });
+    const byePlayers = config.players.filter(p => !playingIds.has(p.id));
+    byeNames = byePlayers.map(p => p.name);
+  } else {
+    const playingTeams = playingMatches.flatMap(m => [m.team1, m.team2]);
+    const allTeamNames = leaderboard.map(t => t.name);
+    byeNames = allTeamNames.filter(n => !playingTeams.includes(n));
+  }
+
+  const toRoman = (n) => { const r = ["","I","II","III","IV","V","VI","VII","VIII","IX","X"]; return n >= 1 && n <= 10 ? r[n] : String(n); };
   playingMatches.forEach((m, i) => {
-    const courtLabel = m.court ?? (i + 1);
+    if (m.court === undefined || m.court === null) throw new Error("Match missing court");
+    const courtLabel = document.body.classList.contains("highlander") ? ("COURT " + toRoman(m.court)) : m.court;
     const winnerClass = m.winner ? 'winner-card' : '';
     grid.innerHTML += `<div class="matchCard ${winnerClass} text-white rounded-lg p-4 text-center">
-      <div class="courtTitle font-bold mb-2 frost-text text-lg">Court ${courtLabel}</div>
+      <div class="courtTitle font-bold mb-2 frost-text text-lg">${courtLabel}</div>
       <div class="text-sm font-semibold leading-tight">${m.team1} vs ${m.team2}</div>
       <div class="mt-2 frost-text text-sm">Winner: ${m.winner||'TBD'}</div></div>`;
   });
 
-  const playingTeams = playingMatches.flatMap(m => [m.team1, m.team2]);
-  const allTeamNames = leaderboard.map(t => t.name);
-  const byeTeams = allTeamNames.filter(n => !playingTeams.includes(n));
-
-  document.getElementById("byeTeams").innerHTML = byeTeams.length ? `<div class="frost-text text-cyan-300 text-sm subGlow"><strong>BYE:</strong> ${byeTeams.join(", ")}</div>` : "";
+  document.getElementById("byeTeams").innerHTML = byeNames.length ? `<div class="frost-text text-cyan-300 text-sm subGlow"><strong>BYE:</strong> ${byeNames.join(", ")}</div>` : "";
 }
 
 function showWinnerOverlay(){
-  const winner=leaderboard[0];document.getElementById("winnerName").textContent=winner.name;
-  showOverlay("winnerOverlay");triggerConfetti();
+  const nameEl = document.getElementById("winnerName");
+  const subEl = document.getElementById("winnerSubtitle");
+  if (config.finalWinners && config.finalWinnerNames && config.finalWinnerNames.length > 0) {
+    nameEl.textContent = config.finalWinnerNames.join(" & ");
+    if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "THERE CAN BE ONLY ONE… BUT TONIGHT WE HAVE LEGENDS." : "CHAMPION";
+  } else {
+    const winner = leaderboard[0];
+    nameEl.textContent = winner ? winner.name : "";
+    if (subEl) subEl.textContent = "";
+  }
+  showOverlay("winnerOverlay");
+  if (config.mode === "random_pairs") { /* Highlander: no confetti */ } else triggerConfetti();
 }
 
 function triggerConfetti(){

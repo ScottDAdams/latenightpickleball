@@ -20,11 +20,117 @@
       --glass2: rgba(255,255,255,0.12);
     }
     body{
-      background: radial-gradient(1200px 800px at 70% 30%, rgba(255,47,214,.25), transparent 55%),
-                  radial-gradient(1000px 700px at 20% 20%, rgba(34,211,238,.18), transparent 55%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2) 55%, #2d0a55 75%, #12002a);
+      background: radial-gradient(1200px 800px at 70% 30%, rgba(255,47,214,.18), transparent 55%),
+                  radial-gradient(1000px 700px at 20% 20%, rgba(34,211,238,.12), transparent 55%),
+                  linear-gradient(180deg, #0f172a 0%, #1e293b 25%, #0f172a 60%, #020617 100%);
       overflow-x:hidden;
     }
+    body.highlander{
+      background: url("https://www.inspiringtravelscotland.com/wp-content/uploads/2019/05/Quiraing-Skye-Scottish-Highlands.jpg") center/cover no-repeat fixed,
+        radial-gradient(ellipse 100% 80% at 50% 0%, rgba(30,41,59,.85) 0%, rgba(15,23,42,.9) 35%, rgba(12,18,34,.92) 60%, rgba(2,6,23,.95) 100%);
+      position: relative;
+    }
+    body.highlander::before{
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,.4) 100%);
+      opacity: .9;
+    }
+    body.highlander::after{
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: .5;
+    }
+    @keyframes lightningFlicker {
+      0%, 88%, 100% { opacity: 0; }
+      90%, 93% { opacity: 0.07; }
+      91% { opacity: 0.14; }
+    }
+    body.highlander #lightningFlickerLayer{
+      background: #fff;
+      animation: lightningFlicker 5s ease-in-out infinite;
+    }
+    body.highlander header h1{
+      background: linear-gradient(180deg, #fef3c7 0%, #f59e0b 25%, #d97706 50%, #b45309 75%, #92400e 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 1px 0 rgba(255,255,255,.3), 0 -1px 0 rgba(0,0,0,.2);
+      filter: drop-shadow(0 0 20px rgba(245,158,11,.35));
+      letter-spacing: .08em;
+    }
+    body.highlander header #headerSubtitle{
+      text-transform: uppercase; letter-spacing: .25em; color: #94a3b8;
+      font-size: .85rem; margin-top: .35rem;
+    }
+    body.highlander header .header-rule{
+      display: block; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,.4), transparent);
+      max-width: 320px; margin: .5rem auto 0; opacity: .8;
+    }
+    body.highlander .matchCard{
+      background: rgba(30,41,59,.75);
+      border: 1px solid rgba(212,175,55,.25);
+      box-shadow: 0 0 20px rgba(212,175,55,.08), 0 10px 25px rgba(0,0,0,.4);
+      backdrop-filter: blur(12px);
+    }
+    body.highlander .matchCard .courtTitle{
+      color: #fcd34d;
+      text-shadow: 0 0 12px rgba(252,211,77,.3);
+      font-variant: small-caps;
+      font-size: .9rem;
+    }
+    body.highlander #leaderboardPanel{
+      background: rgba(15,23,42,.85);
+      border: 1px solid rgba(212,175,55,.2);
+      box-shadow: 0 0 18px rgba(0,0,0,.3);
+    }
+    body.highlander #leaderboardPanel .leaderboard-row{ border-bottom: 1px solid rgba(212,175,55,.15); }
+    body.highlander #leaderboardPanel .leaderboard-row.tied-leader{ box-shadow: 0 0 14px rgba(252,211,77,.12); }
+    body.highlander #leaderboardPanel .wins-num{ font-weight: bold; color: #fcd34d; }
+    body.highlander #winnerOverlay{
+      background: radial-gradient(ellipse 100% 100% at 50% 30%, #1e293b 0%, #0f172a 40%, #020617 100%);
+    }
+    body.highlander #winnerOverlay .winner-name-cinematic{
+      background: linear-gradient(180deg, #fef3c7, #f59e0b);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-transform: uppercase; letter-spacing: .1em;
+      filter: drop-shadow(0 0 24px rgba(245,158,11,.5));
+    }
+    /* Highlander button theme: dark slate + gold, readable */
+    body.highlander .neonBtn{
+      background: rgba(30,41,59,.95);
+      border: 1px solid rgba(212,175,55,.45);
+      color: #fef3c7;
+      box-shadow: 0 4px 14px rgba(0,0,0,.35), 0 0 12px rgba(212,175,55,.1);
+    }
+    body.highlander .neonBtn:hover:not(:disabled){
+      background: rgba(51,65,85,.95);
+      border-color: rgba(212,175,55,.65);
+      box-shadow: 0 6px 18px rgba(0,0,0,.4), 0 0 16px rgba(252,211,77,.2);
+      color: #fff;
+    }
+    body.highlander .neonPrimary{ background: linear-gradient(135deg, #b45309, #92400e); border-color: rgba(212,175,55,.5); color: #fef3c7; }
+    body.highlander .neonPrimary:hover:not(:disabled){ background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+    body.highlander .neonWarn{ background: linear-gradient(135deg, #991b1b, #7f1d1d); border-color: rgba(248,113,113,.4); color: #fecaca; }
+    body.highlander .neonWarn:hover:not(:disabled){ background: linear-gradient(135deg, #b91c1c, #991b1b); color: #fff; }
+    body.highlander .neonGo{ background: linear-gradient(135deg, #166534, #14532d); border-color: rgba(134,239,172,.35); color: #d1fae5; }
+    body.highlander .neonGo:hover:not(:disabled){ background: linear-gradient(135deg, #15803d, #166534); color: #fff; }
+    body.highlander .neonAlt{ background: rgba(51,65,85,.95); border-color: rgba(148,163,184,.4); color: #e2e8f0; }
+    body.highlander .neonAlt:hover:not(:disabled){ background: rgba(71,85,105,.95); border-color: rgba(212,175,55,.4); color: #fef3c7; }
+    body.highlander .winner-button{
+      background: linear-gradient(135deg, #166534, #14532d) !important;
+      border-color: rgba(212,175,55,.5) !important;
+      color: #d1fae5 !important;
+      box-shadow: 0 0 14px rgba(34,197,94,.35) !important;
+    }
+    @keyframes lightningBurst {
+      0% { opacity: 0; }
+      10% { opacity: 0.9; }
+      25% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    .lightning-flash{ position: fixed; inset: 0; background: #fff; pointer-events: none; z-index: 1; opacity: 0; }
+    .lightning-flash.on{ animation: lightningBurst 0.2s ease-out; }
+    .lightning-flash.champion{ animation: lightningBurst 0.5s ease-out; }
     #bgFX{
       position: fixed;
       inset: 0;
@@ -186,10 +292,12 @@
 </head>
 <body class="min-h-screen flex flex-col text-white relative">
 <div id="bgFX"></div>
+<div id="lightningFlickerLayer" class="fixed inset-0 pointer-events-none z-0 opacity-0" aria-hidden="true"></div>
 
 <header class="text-center py-6 relative z-10">
-  <h1 class="text-5xl font-extrabold winter-header neonTitle chrome" id="headerTitle">Eighties Lateies</h1>
-  <div class="text-center text-sm mt-1 text-cyan-200 subGlow">Synthwave Edition</div>
+  <h1 class="text-5xl font-extrabold winter-header neonTitle chrome" id="headerTitle">Pickleball Event Maker</h1>
+  <div class="text-center text-sm mt-1 text-slate-300 subGlow" id="headerSubtitle"></div>
+  <span class="header-rule hidden" id="headerRule"></span>
 </header>
 
 <div id="setupPanel" class="glassStrong p-6 rounded-lg max-w-4xl mx-auto mb-4 relative z-10">
@@ -197,11 +305,22 @@
   <div class="grid grid-cols-2 gap-4 mb-6">
     <div>
       <label class="block mb-1 winter-text text-cyan-200">Event Name</label>
-      <input type="text" id="eventName" value="Eighties Lateies" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" />
+      <input type="text" id="eventName" value="Highlander Pickleball" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" />
     </div>
     <div>
+      <label class="block mb-1 winter-text text-cyan-200">Team Mode</label>
+      <select id="modeSelect" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" onchange="onModeChange()">
+        <option value="set_teams">Set Teams (fixed)</option>
+        <option value="random_pairs">Random Teams (Highlander)</option>
+      </select>
+    </div>
+    <div id="teamCountRow">
       <label class="block mb-1 winter-text text-cyan-200">Number of Teams</label>
-      <input type="number" id="teamCount" value="12" min="4" max="14" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" onchange="renderTeamInputsDynamic()" />
+      <input type="number" id="teamCount" value="12" min="4" max="14" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" onchange="renderNameInputsDynamic()" />
+    </div>
+    <div id="playerCountRow" class="hidden">
+      <label class="block mb-1 winter-text text-cyan-200">Number of Players</label>
+      <input type="number" id="playerCount" value="8" min="4" max="24" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" onchange="renderNameInputsDynamic()" />
     </div>
     <div>
       <label class="block mb-1 winter-text text-cyan-200">Number of Courts</label>
@@ -224,7 +343,11 @@
     <input type="checkbox" id="fullscreenToggle" class="w-5 h-5 accent-cyan-400" />
     <label for="fullscreenToggle" class="text-lg winter-text text-cyan-200">Enable Full Screen Mode during rounds</label>
   </div>
-  <h4 class="text-xl font-semibold mb-2 text-center winter-text text-cyan-300">Team Names</h4>
+  <div id="stormSoundRow" class="mb-6 flex items-center gap-2 hidden">
+    <input type="checkbox" id="stormSoundToggle" class="w-5 h-5 accent-amber-500" />
+    <label for="stormSoundToggle" class="text-lg winter-text text-amber-200/90">⚡ Storm Mode Sound (muted by default)</label>
+  </div>
+  <h4 class="text-xl font-semibold mb-2 text-center winter-text text-cyan-300" id="nameInputsLabel">Team Names</h4>
   <div id="teamInputs" class="flex flex-wrap gap-2 justify-center mb-4"></div>
   <div class="text-center">
     <button onclick="createTournament()" class="neonBtn neonPrimary px-8 py-4 rounded-full font-bold text-xl">
@@ -244,15 +367,23 @@
       <button id="shareBtn" class="neonBtn neonGo px-4 py-2 rounded-full font-bold text-white">Spectator QR Code</button>
     </div>
     <div id="roundStatus" class="text-center mb-4 text-lg winter-text text-yellow-300"></div>
+    <div id="repeatPairWarning" class="text-center mb-2 text-amber-400/90 text-sm hidden">⚡ Pairing constraint exhausted — 1 repeat partnership used.</div>
     <h2 class="text-2xl mb-4 winter-text text-cyan-300 subGlow" id="roundNumber">Round 0</h2>
     <div id="courtGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     <div id="byeTeams" class="mt-6 text-center"></div>
   </div>
-  <div class="w-1/3 glassStrong p-4 rounded-lg">
+  <div id="pairingImpossibleModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] hidden">
+    <div class="glassStrong rounded-xl p-8 max-w-md text-center">
+      <p class="text-lg mb-4">Pairing algorithm failed — this is a bug. Check the console for a debug report (remaining players, legal partner counts, history size).</p>
+      <button onclick="document.getElementById('pairingImpossibleModal').classList.add('hidden')" class="neonBtn neonAlt px-6 py-2 rounded-full font-bold">OK</button>
+    </div>
+  </div>
+  <div id="leaderboardPanel" class="w-1/3 glassStrong p-4 rounded-lg">
     <h2 class="text-2xl mb-2 winter-text text-cyan-300 subGlow">Leaderboard</h2>
     <div id="leaderboard" class="space-y-2"></div>
   </div>
 </main>
+<div id="lightningFlash" class="lightning-flash"></div>
 
 <div id="countdownOverlay" class="overlay hidden text-[10rem] font-bold animate-bounce winter-text neonTitle">0</div>
 <div id="goOverlay" class="overlay hidden text-[12rem] font-bold winter-text neonTitle" style="color:#ff4fd8;">GO!</div>
@@ -262,6 +393,7 @@
 </div>
 <div id="winnerOverlay" class="overlay hidden flex-col text-center">
   <h1 class="text-6xl font-bold mb-6 winter-text neonTitle">Champion: <span id="winnerName"></span></h1>
+  <p id="winnerSubtitle" class="text-xl text-cyan-200 mb-4"></p>
   <div id="finalLeaderboard" class="text-3xl"></div>
 </div>
 <div id="qrOverlay" class="overlay hidden flex-col text-center">
@@ -274,6 +406,7 @@
   <button onclick="document.getElementById('qrOverlay').classList.add('hidden')" class="mt-4 text-cyan-300 hover:text-cyan-200 underline">Close</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="./pairing.js"></script>
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const isReadOnly = urlParams.get('view') === 'readonly';
@@ -281,9 +414,26 @@ let eventId = urlParams.get('event') || null;
 
 let teams=[], leaderboard=[], matches=[], round=0, config={}, roundRobinSchedule=[];
 let timerInterval, timeLeft=0, inProgress=false;
-let roundStatus = "idle"; // idle, countdown, in_progress, completed
-let roundHistory = []; // Store matches for each round for going back
-let allSavedMatches = []; // Store all matches from database to preserve court assignments
+let roundStatus = "idle";
+let roundHistory = [];
+let allSavedMatches = [];
+let currentRoundByes = []; // Random mode: players sitting this round
+
+function updateHeaderForMode() {
+  const isHighlander = document.body.classList.contains("highlander");
+  const titleEl = document.getElementById("headerTitle");
+  const subEl = document.getElementById("headerSubtitle");
+  const ruleEl = document.getElementById("headerRule");
+  if (isHighlander) {
+    titleEl.textContent = "Highlander Pickleball";
+    if (subEl) { subEl.textContent = "THERE CAN BE ONLY ONE"; subEl.classList.remove("hidden"); }
+    if (ruleEl) { ruleEl.classList.remove("hidden"); }
+  } else {
+    titleEl.textContent = eventId && window.event ? window.event.name : "Pickleball Event Maker";
+    if (subEl) { subEl.textContent = ""; subEl.classList.add("hidden"); }
+    if (ruleEl) ruleEl.classList.add("hidden");
+  }
+}
 
 async function init() {
   if (eventId) {
@@ -291,14 +441,15 @@ async function init() {
     document.getElementById("setupPanel").classList.add("hidden");
     document.getElementById("mainPanel").classList.remove("hidden");
     document.title = event.name;
-    document.getElementById("headerTitle").textContent = event.name;
+    updateHeaderForMode();
     renderUI();
     updateButtonStates();
     if (isReadOnly) {
       disableButtons();
     }
   } else {
-    renderTeamInputsDynamic();
+    onModeChange();
+    renderNameInputsDynamic();
   }
   document.getElementById('shareBtn').addEventListener('click',()=>{
     if (!eventId) return;
@@ -319,46 +470,115 @@ function disableButtons(){
   });
 }
 
-function renderTeamInputsDynamic(){
-  const count=parseInt(document.getElementById("teamCount").value);
-  const container=document.getElementById("teamInputs");
-  container.innerHTML="";
-  const winterNames = ["Every Dink You Take", "The Karate Dinks", "Hit Me With Your Best Shot", "My Little Pony", "Purple Pain", "Sweet Dinks are Made of These", "Ghostbusters", "Weekend at Ernies", "Rolling Dinks", "Cyndi Lobbers", "O-O Yeah!", "Lob Bamba"];
-  for(let i=0;i<count;i++){
-    const defaultValue = winterNames[i] || `Team ${i+1}`;
-    container.innerHTML+=`<input type="text" id="teamInput${i}" value="${defaultValue}" class="p-2 rounded text-black text-sm border-2 border-cyan-400 focus:border-cyan-300 winter-text min-w-[140px] max-w-[220px]">`;
+function getMode(){ return document.getElementById("modeSelect").value; }
+function onModeChange(){
+  const mode = getMode();
+  const teamCountRow = document.getElementById("teamCountRow");
+  const playerCountRow = document.getElementById("playerCountRow");
+  const labelEl = document.getElementById("nameInputsLabel");
+  const stormRow = document.getElementById("stormSoundRow");
+  if (mode === "random_pairs") {
+    teamCountRow.classList.add("hidden");
+    playerCountRow.classList.remove("hidden");
+    if (stormRow) stormRow.classList.remove("hidden");
+    labelEl.textContent = "Player Names";
+    document.body.classList.add("highlander");
+  } else {
+    teamCountRow.classList.remove("hidden");
+    playerCountRow.classList.add("hidden");
+    if (stormRow) stormRow.classList.add("hidden");
+    labelEl.textContent = "Team Names";
+    document.body.classList.remove("highlander");
+  }
+  renderNameInputsDynamic();
+}
+function renderNameInputsDynamic(){
+  const mode = getMode();
+  const count = mode === "random_pairs"
+    ? parseInt(document.getElementById("playerCount").value) || 8
+    : parseInt(document.getElementById("teamCount").value) || 12;
+  const container = document.getElementById("teamInputs");
+  container.innerHTML = "";
+  const defaultTeams = ["Every Dink You Take", "The Karate Dinks", "Hit Me With Your Best Shot", "My Little Pony", "Purple Pain", "Sweet Dinks are Made of These", "Ghostbusters", "Weekend at Ernies", "Rolling Dinks", "Cyndi Lobbers", "Antonio Pia", "Neil Jamie"];
+  const defaultPlayers = ["Player 1", "Player 2", "Player 3", "Player 4", "Player 5", "Player 6", "Player 7", "Player 8", "Player 9", "Player 10", "Player 11", "Player 12"];
+  const defaults = mode === "random_pairs" ? defaultPlayers : defaultTeams;
+  for (let i = 0; i < count; i++) {
+    const defaultValue = defaults[i] || (mode === "random_pairs" ? `Player ${i+1}` : `Team ${i+1}`);
+    const id = mode === "random_pairs" ? `playerInput${i}` : `teamInput${i}`;
+    container.innerHTML += `<input type="text" id="${id}" value="${defaultValue}" class="p-2 rounded text-black text-sm border-2 border-cyan-400 focus:border-cyan-300 winter-text min-w-[140px] max-w-[220px]">`;
   }
 }
 
 async function createTournament(){
-  const eventName=document.getElementById("eventName").value||"Pickleball Event";
-  config={
-    teamCount:parseInt(document.getElementById("teamCount").value),
-    courtCount:parseInt(document.getElementById("courtCount").value),
-    totalRounds:parseInt(document.getElementById("totalRounds").value),
-    roundDuration:parseInt(document.getElementById("roundDuration").value),
-    countdownDuration:parseInt(document.getElementById("countdownDuration").value)
+  const eventName = document.getElementById("eventName").value || "Pickleball Event";
+  const mode = getMode();
+  config = {
+    mode: mode,
+    courtCount: parseInt(document.getElementById("courtCount").value),
+    totalRounds: parseInt(document.getElementById("totalRounds").value),
+    roundDuration: parseInt(document.getElementById("roundDuration").value),
+    countdownDuration: parseInt(document.getElementById("countdownDuration").value),
+    stormSound: document.getElementById("stormSoundToggle")?.checked ?? false
   };
-  teams=[];for(let i=0;i<config.teamCount;i++){teams.push(document.getElementById(`teamInput${i}`).value||`Team ${i+1}`);}
-  leaderboard=teams.map(n=>({name:n,wins:0}));
-  round=0;
+  if (mode === "set_teams") {
+    config.teamCount = parseInt(document.getElementById("teamCount").value);
+    teams = [];
+    for (let i = 0; i < config.teamCount; i++) {
+      teams.push(document.getElementById(`teamInput${i}`).value || `Team ${i+1}`);
+    }
+    leaderboard = teams.map(n => ({ name: n, wins: 0 }));
+    roundRobinSchedule = createRoundRobinSchedule(teams);
+  } else {
+    const playerCount = parseInt(document.getElementById("playerCount").value);
+    config.players = [];
+    for (let i = 0; i < playerCount; i++) {
+      config.players.push({
+        id: crypto.randomUUID(),
+        name: document.getElementById(`playerInput${i}`).value?.trim() || `Player ${i+1}`,
+        wins: 0
+      });
+    }
+    config.partnerHistory = {};
+    config.playerByeCounts = {};
+    config.playerLastByeRound = {};
+    config.players.forEach(p => { config.playerByeCounts[p.id] = 0; config.playerLastByeRound[p.id] = 0; });
+    config.repeatPairsUsedTotal = 0;
+    config.repeatPairsUsedThisRound = 0;
+    teams = config.players.map(p => p.name);
+    leaderboard = config.players.map(p => ({ id: p.id, name: p.name, wins: 0 }));
+    roundRobinSchedule = [];
+  }
+  round = 0;
   roundStatus = "idle";
   roundHistory = [];
-  roundRobinSchedule=createRoundRobinSchedule(teams);
-  const res=await fetch("/.netlify/functions/save-event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:eventName,config,round,status:"idle",teams:leaderboard})});
-  const data=await res.json();eventId=data.eventId;
-  round=1;
-  let firstMatches = roundRobinSchedule[0] || [];
-  matches = assignCourtsToMatches(firstMatches, config.courtCount);
-  // Add round number to each match
-  matches.forEach(m => m.round = round);
+  const teamsForApi = config.mode === "random_pairs" ? leaderboard.map(p => ({ name: p.name, wins: p.wins })) : leaderboard.map(t => ({ name: t.name, wins: t.wins }));
+  const res = await fetch("/.netlify/functions/save-event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: eventName, config, round, status: "idle", teams: teamsForApi }) });
+  const data = await res.json();
+  eventId = data.eventId;
+  round = 1;
+  if (mode === "set_teams") {
+    let firstMatches = roundRobinSchedule[0] || [];
+    matches = assignCourtsToMatches(firstMatches, config.courtCount);
+    matches.forEach(m => m.round = round);
+  } else {
+    const out = PAIRING.generateRandomRoundMatches(config.players, config.courtCount, config, round, { maxRetries: 500, strictNoRepeat: true });
+    if (out.impossible) {
+      document.getElementById("pairingImpossibleModal").classList.remove("hidden");
+      return;
+    }
+    matches = out.matches;
+    config = out.config;
+    currentRoundByes = out.byePlayers || [];
+    document.getElementById("repeatPairWarning").classList.toggle("hidden", !out.usedRepeat);
+  }
   allSavedMatches = JSON.parse(JSON.stringify(matches));
-  await saveEvent({round,status:"idle",matches});
-  history.replaceState(null,"",`?event=${eventId}`);
+  await saveEvent({ round, status: "idle", matches, config, teams: config.mode === "random_pairs" ? leaderboard.map(p => ({ name: p.name, wins: p.wins })) : leaderboard });
+  history.replaceState(null, "", `?event=${eventId}`);
   document.title = eventName;
   document.getElementById("headerTitle").textContent = eventName;
   document.getElementById("setupPanel").classList.add("hidden");
   document.getElementById("mainPanel").classList.remove("hidden");
+  if (mode === "random_pairs") document.body.classList.add("highlander");
   renderUI();
   updateButtonStates();
 }
@@ -386,13 +606,22 @@ function createRoundRobinSchedule(teamList){
 }
 
 function shuffleArray(array) {
-  // Fisher-Yates shuffle for true randomization
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+}
+
+function computeSOS(playerName, allMatches) {
+  let sos = 0;
+  allMatches.forEach(m => {
+    const pair1 = PAIRING.parsePairLabel(m.team1), pair2 = PAIRING.parsePairLabel(m.team2);
+    const opponents = pair1.includes(playerName) ? pair2 : pair2.includes(playerName) ? pair1 : null;
+    if (opponents) opponents.forEach(opp => { sos += leaderboard.find(t => t.name === opp)?.wins || 0; });
+  });
+  return sos;
 }
 
 function assignCourtsToMatches(matchList, courtCount) {
@@ -442,10 +671,12 @@ function allWinnersEntered() {
 }
 
 function canGoToNextRound() {
-  // Must have completed the round (played it) AND all winners must be entered
   if (roundStatus !== "completed") return false;
   if (!allWinnersEntered()) return false;
-  // Check if there are more rounds in the schedule
+  if (config.mode === "random_pairs") {
+    const maxR = config.totalRounds || 0;
+    return maxR === 0 || round < maxR;
+  }
   if (round >= roundRobinSchedule.length) return false;
   return true;
 }
@@ -579,32 +810,43 @@ async function nextRound(){
     return;
   }
   
-  // Save current round state to history before moving on
   roundHistory.push({
     round: round,
     matches: JSON.parse(JSON.stringify(matches)),
-    leaderboard: JSON.parse(JSON.stringify(leaderboard))
+    leaderboard: JSON.parse(JSON.stringify(leaderboard)),
+    configSnapshot: config.mode === "random_pairs" ? { partnerHistory: { ...(config.partnerHistory || {}) }, playerByeCounts: { ...(config.playerByeCounts || {}) }, playerLastByeRound: { ...(config.playerLastByeRound || {}) } } : undefined
   });
   
   round++;
   roundStatus = "idle";
   
-  // Check if we have saved matches for this round (preserves court assignments)
-  const savedMatchesForRound = allSavedMatches.filter(m => m.round === round);
-  if (savedMatchesForRound.length > 0) {
-    // Use saved matches to preserve court assignments
-    matches = JSON.parse(JSON.stringify(savedMatchesForRound));
-  } else {
-    // Brand new round - create matches and randomize courts once
-    let nextMatches = roundRobinSchedule[round - 1] || [];
-    matches = assignCourtsToMatches(nextMatches, config.courtCount);
-    // Add round number to each match and add to allSavedMatches so they're preserved
-    matches.forEach(m => m.round = round);
+  if (config.mode === "random_pairs") {
+    const out = PAIRING.generateRandomRoundMatches(config.players, config.courtCount, config, round, { maxRetries: 500, strictNoRepeat: true });
+    if (out.impossible) {
+      document.getElementById("pairingImpossibleModal").classList.remove("hidden");
+      return;
+    }
+    matches = out.matches;
+    config = out.config;
+    currentRoundByes = out.byePlayers || [];
+    document.getElementById("repeatPairWarning").classList.toggle("hidden", !out.usedRepeat);
     allSavedMatches.push(...JSON.parse(JSON.stringify(matches)));
+    document.getElementById("timer").textContent = "Ready?";
+    await saveEvent({ round, status: "idle", matches, teams: leaderboard.map(p => ({ name: p.name, wins: p.wins })), config });
+  } else {
+    const savedMatchesForRound = allSavedMatches.filter(m => m.round === round);
+    if (savedMatchesForRound.length > 0) {
+      matches = JSON.parse(JSON.stringify(savedMatchesForRound));
+    } else {
+      let nextMatches = roundRobinSchedule[round - 1] || [];
+      matches = assignCourtsToMatches(nextMatches, config.courtCount);
+      matches.forEach(m => m.round = round);
+      allSavedMatches.push(...JSON.parse(JSON.stringify(matches)));
+    }
+    currentRoundByes = [];
+    document.getElementById("timer").textContent = "Ready?";
+    await saveEvent({ round, status: "idle", matches, teams: leaderboard });
   }
-  
-  document.getElementById("timer").textContent="Ready?";
-  await saveEvent({round, status:"idle", matches, teams: leaderboard});
   renderUI();
   updateButtonStates();
 }
@@ -624,37 +866,44 @@ async function previousRound() {
   allSavedMatches = allSavedMatches.filter(m => m.round !== round);
   allSavedMatches.push(...JSON.parse(JSON.stringify(matches)));
   
-  // If we have stored leaderboard, use it; otherwise recalculate
   if (prevState.leaderboard) {
     leaderboard = JSON.parse(JSON.stringify(prevState.leaderboard));
   } else {
-    // Recalculate leaderboard from all matches up to this round
     recalculateLeaderboard();
   }
-  
-  roundStatus = "completed"; // Set to completed so they can edit winners
-  
-  // Also restore winners in roundRobinSchedule
-  for (const match of matches) {
-    updateRoundRobinScheduleMatch(match.team1, match.team2, match.winner);
+  if (config.mode === "random_pairs" && prevState.configSnapshot) {
+    config.partnerHistory = prevState.configSnapshot.partnerHistory;
+    config.playerByeCounts = prevState.configSnapshot.playerByeCounts;
+    config.playerLastByeRound = prevState.configSnapshot.playerLastByeRound;
   }
-  
+  roundStatus = "completed";
+  if (config.mode !== "random_pairs") {
+    for (const match of matches) updateRoundRobinScheduleMatch(match.team1, match.team2, match.winner);
+  }
+  if (config.mode === "random_pairs") {
+    const playing = new Set();
+    matches.forEach(m => { PAIRING.parsePairLabel(m.team1).forEach(p => playing.add(p)); PAIRING.parsePairLabel(m.team2).forEach(p => playing.add(p)); });
+    currentRoundByes = (config.players || teams).filter(p => !playing.has(p));
+  }
   document.getElementById("timer").textContent="Enter Winners";
-  await saveEvent({round, status:"completed", matches, teams: leaderboard});
+  await saveEvent({ round, status:"completed", matches, teams: leaderboard, config: config.mode === "random_pairs" ? config : undefined });
   renderUI();
   updateButtonStates();
 }
 
 function recalculateLeaderboard() {
-  // Reset all wins to 0
   leaderboard.forEach(t => t.wins = 0);
-  
-  // Count wins from roundRobinSchedule
-  const allMatches = roundRobinSchedule.flat();
-  for (const match of allMatches) {
-    if (match.winner) {
-      const team = leaderboard.find(t => t.name === match.winner);
-      if (team) team.wins++;
+  if (config.mode === "random_pairs") {
+    allSavedMatches.forEach(m => {
+      if (m.winner) applyPairWins(m.winner, 1);
+    });
+  } else {
+    const allMatches = roundRobinSchedule.flat();
+    for (const match of allMatches) {
+      if (match.winner) {
+        const team = leaderboard.find(t => t.name === match.winner);
+        if (team) team.wins++;
+      }
     }
   }
 }
@@ -666,26 +915,95 @@ function confirmEndEvent() {
 }
 
 async function endEvent() {
-  // Sort leaderboard with proper tie-breaking
-  leaderboard.sort((a, b) => {
-    if (b.wins !== a.wins) return b.wins - a.wins;
-    // If wins are equal, use head-to-head
-    return getHeadToHeadResult(b.name, a.name);
-  });
-
-  await saveEvent({ status: "event_done" });
+  if (config.mode === "random_pairs") {
+    leaderboard.sort((a, b) => b.wins - a.wins);
+    const topWins = leaderboard[0].wins;
+    const tied = leaderboard.filter(t => t.wins === topWins);
+    if (tied.length > 1) {
+      const names = tied.map(t => t.name);
+      names.sort((a, b) => computeSOS(b, allSavedMatches) - computeSOS(a, allSavedMatches));
+      const bestSOS = computeSOS(names[0], allSavedMatches);
+      const coChampNames = names.filter(n => computeSOS(n, allSavedMatches) === bestSOS);
+      if (coChampNames.length > 1) {
+        config.finalWinners = tied.filter(t => coChampNames.includes(t.name)).map(t => t.id);
+        config.finalWinnerNames = coChampNames;
+        await saveEvent({ status: "event_done", config, teams: leaderboard.map(p => ({ name: p.name, wins: p.wins })) });
+        document.getElementById("winnerName").textContent = coChampNames.join(" & ");
+        const subEl = document.getElementById("winnerSubtitle");
+        if (subEl) subEl.textContent = "THERE CAN BE ONLY ONE… BUT TONIGHT WE HAVE LEGENDS.";
+        document.getElementById("finalLeaderboard").innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
+        showWinnerOverlay();
+        return;
+      }
+    }
+    leaderboard.sort((a, b) => b.wins - a.wins);
+    config.finalWinners = [leaderboard[0].id];
+    config.finalWinnerNames = [leaderboard[0].name];
+  } else {
+    leaderboard.sort((a, b) => {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      return getHeadToHeadResult(b.name, a.name);
+    });
+  }
+  const extra = { status: "event_done" };
+  if (config.mode === "random_pairs") extra.config = config, extra.teams = leaderboard.map(p => ({ name: p.name, wins: p.wins }));
+  await saveEvent(extra);
+  document.getElementById("winnerName").textContent = leaderboard[0].name;
+  const subEl = document.getElementById("winnerSubtitle");
+  if (subEl) subEl.textContent = "";
   showWinnerOverlay();
 }
 
-    function showWinnerOverlay() {
-      hideOverlays();
-      const winner = leaderboard[0].name;
-      document.getElementById("winnerName").textContent = winner;
-      const lb = document.getElementById("finalLeaderboard");
-      lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
-      showOverlay("winnerOverlay");
-      launchConfetti();
-    }
+function triggerLightningFlash(kind) {
+  const el = document.getElementById("lightningFlash");
+  if (!el) return;
+  el.classList.remove("on", "champion");
+  el.offsetHeight;
+  el.classList.add(kind === "champion" ? "champion" : "on");
+  setTimeout(() => { el.classList.remove("on", "champion"); }, kind === "champion" ? 500 : 200);
+}
+
+function playStormRumble() {
+  if (!config.stormSound) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.15));
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.08;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(0);
+  } catch (_) {}
+}
+
+function showWinnerOverlay() {
+  hideOverlays();
+  const nameEl = document.getElementById("winnerName");
+  const subEl = document.getElementById("winnerSubtitle");
+  const isHighlander = document.body.classList.contains("highlander");
+  if (config.finalWinnerNames && config.finalWinnerNames.length > 0) {
+    nameEl.textContent = config.finalWinnerNames.join(" & ");
+    if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "THERE CAN BE ONLY ONE… BUT TONIGHT WE HAVE LEGENDS." : "CHAMPION";
+  } else {
+    nameEl.textContent = leaderboard[0] ? leaderboard[0].name : "";
+    if (subEl) subEl.textContent = "";
+  }
+  if (isHighlander) {
+    nameEl.classList.add("winner-name-cinematic");
+    triggerLightningFlash("champion");
+    playStormRumble();
+  } else {
+    nameEl.classList.remove("winner-name-cinematic");
+    launchConfetti();
+  }
+  const lb = document.getElementById("finalLeaderboard");
+  lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
+  showOverlay("winnerOverlay");
+}
 
     function launchConfetti() {
       const duration = 4000, end = Date.now() + duration;
@@ -699,41 +1017,49 @@ async function endEvent() {
       }, 250);
     }
 
+function applyPairWins(pairLabel, delta) {
+  const names = PAIRING.parsePairLabel(pairLabel);
+  names.forEach(name => {
+    const entry = leaderboard.find(t => t.name === name);
+    if (entry) entry.wins += delta;
+  });
+}
+
 async function recordWin(index,teamName){
   if(isReadOnly)return;
   const match=matches[index];
-  
-  // If clicking the same team that already won, clear the selection
   if(match.winner === teamName) {
-    const prevTeam = leaderboard.find(t => t.name === match.winner);
-    if(prevTeam) prevTeam.wins--;
-    match.winner = null;
-    // Also update roundRobinSchedule
-    updateRoundRobinScheduleMatch(match.team1, match.team2, null);
-  } else {
-    // Remove previous winner's win if there was one
-    if(match.winner) {
+    if (config.mode === "random_pairs") {
+      applyPairWins(teamName, -1);
+    } else {
       const prevTeam = leaderboard.find(t => t.name === match.winner);
       if(prevTeam) prevTeam.wins--;
+      updateRoundRobinScheduleMatch(match.team1, match.team2, null);
     }
-    // Set new winner
+    match.winner = null;
+  } else {
+    if (config.mode === "random_pairs") {
+      if (match.winner) applyPairWins(match.winner, -1);
+      applyPairWins(teamName, 1);
+    } else {
+      if(match.winner) {
+        const prevTeam = leaderboard.find(t => t.name === match.winner);
+        if(prevTeam) prevTeam.wins--;
+      }
+      match.winner = teamName;
+      const team = leaderboard.find(t => t.name === teamName);
+      if(team) team.wins++;
+      updateRoundRobinScheduleMatch(match.team1, match.team2, teamName);
+    }
     match.winner = teamName;
-    const team = leaderboard.find(t => t.name === teamName);
-    if(team) team.wins++;
-    // Also update roundRobinSchedule
-    updateRoundRobinScheduleMatch(match.team1, match.team2, teamName);
   }
-  
-  // Update allSavedMatches to keep it in sync
   const matchIndex = allSavedMatches.findIndex(m => 
     m.round === round && 
     ((m.team1 === match.team1 && m.team2 === match.team2) || 
      (m.team1 === match.team2 && m.team2 === match.team1))
   );
-  if (matchIndex !== -1) {
-    allSavedMatches[matchIndex] = {...match};
-  }
-  
+  if (matchIndex !== -1) allSavedMatches[matchIndex] = {...match};
+  if (document.body.classList.contains("highlander")) triggerLightningFlash("win");
   await saveEvent({matches, teams: leaderboard});
   renderUI();
   updateButtonStates();
@@ -752,53 +1078,61 @@ function updateRoundRobinScheduleMatch(team1, team2, winner) {
 }
 
 async function saveEvent(extra={}){
-  await fetch("/.netlify/functions/save-event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({eventId,name:document.title,config,round,...extra,teams:leaderboard,matches})});
+  const teamsPayload = (extra.teams !== undefined ? extra.teams : leaderboard).map(t => typeof t === "object" && t != null && "name" in t ? { name: t.name, wins: t.wins ?? 0 } : { name: String(t), wins: 0 });
+  const payload = { eventId, name: document.title, config, round, ...extra, teams: teamsPayload, matches };
+  await fetch("/.netlify/functions/save-event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 }
 
 async function loadEvent(){
   const res=await fetch(`/.netlify/functions/load-event?event=${eventId}`);
   if(res.ok){
     const data=await res.json();window.event=data.event;
-    leaderboard=data.teams.map(t=>({name:t.name,wins:t.wins}));
-    teams = data.teams.map(t => t.name); // Recreate teams array
-    round=data.event.round;config=data.event.config;
-    
-    // Store all saved matches to preserve court assignments
+    config = data.event.config || {};
+    round = data.event.round;
     allSavedMatches = data.matches || [];
     matches = allSavedMatches.filter(m=>m.round===round);
-    
-    // Set roundStatus based on loaded event status
-    const loadedStatus = data.event.status;
-    if (loadedStatus === "idle" || loadedStatus === "countdown" || loadedStatus === "in_progress" || loadedStatus === "completed") {
-      roundStatus = loadedStatus;
+    if (config.mode === "random_pairs") {
+      const players = config.players || [];
+      if (players.length && typeof players[0] === "object" && players[0].id) {
+        leaderboard = players.map(p => ({ id: p.id, name: p.name, wins: (data.teams.find(t => t.name === p.name))?.wins ?? p.wins ?? 0 }));
+      } else {
+        const names = players.length ? players : data.teams.map(t => t.name);
+        leaderboard = names.map((n, idx) => ({ id: crypto.randomUUID(), name: typeof n === "string" ? n : n.name, wins: (data.teams.find(t => t.name === (typeof n === "string" ? n : n.name)))?.wins ?? 0 }));
+        config.players = leaderboard.map(p => ({ ...p }));
+      }
+      teams = leaderboard.map(p => p.name);
+      roundRobinSchedule = [];
+      document.body.classList.add("highlander");
+      const playingIds = new Set();
+      matches.forEach(m => {
+        PAIRING.parsePairLabel(m.team1).concat(PAIRING.parsePairLabel(m.team2)).forEach(name => {
+          const pl = config.players.find(p => p.name === name);
+          if (pl && pl.id) playingIds.add(pl.id);
+        });
+      });
+      currentRoundByes = (config.players || []).filter(p => !playingIds.has(p.id));
     } else {
-      roundStatus = "idle";
+      leaderboard = data.teams.map(t => ({ name: t.name, wins: t.wins }));
+      teams = data.teams.map(t => t.name);
+      roundRobinSchedule = createRoundRobinSchedule(teams);
+      document.body.classList.remove("highlander");
+      currentRoundByes = [];
     }
-    
-    // Recreate roundRobinSchedule from loaded teams
-    roundRobinSchedule = createRoundRobinSchedule(teams);
-    // Update roundRobinSchedule with winners from all loaded matches
-    for (const loadedMatch of allSavedMatches) {
-      if (loadedMatch.winner) {
-        updateRoundRobinScheduleMatch(loadedMatch.team1, loadedMatch.team2, loadedMatch.winner);
+    const loadedStatus = data.event.status;
+    roundStatus = (loadedStatus === "idle" || loadedStatus === "countdown" || loadedStatus === "in_progress" || loadedStatus === "completed") ? loadedStatus : "idle";
+    if (config.mode !== "random_pairs") {
+      for (const loadedMatch of allSavedMatches) {
+        if (loadedMatch.winner) updateRoundRobinScheduleMatch(loadedMatch.team1, loadedMatch.team2, loadedMatch.winner);
       }
     }
-    
-    // Rebuild round history from previous rounds
     roundHistory = [];
     for (let r = 1; r < round; r++) {
       const roundMatches = allSavedMatches.filter(m => m.round === r);
-      if (roundMatches.length > 0) {
-        // Calculate leaderboard state at that round (simplified - just track it was played)
-        roundHistory.push({
-          round: r,
-          matches: roundMatches,
-          leaderboard: null // We can't fully reconstruct, but we have match data
-        });
-      }
+      if (roundMatches.length > 0) roundHistory.push({ round: r, matches: roundMatches, leaderboard: null });
     }
-    
     updateButtonStates();
+    updateHeaderForMode();
+    if (loadedStatus === "event_done") showWinnerOverlay();
   }
 }
 
@@ -807,22 +1141,30 @@ function hideOverlays(){document.querySelectorAll(".overlay").forEach(el=>el.cla
 function renderUI(){
   document.getElementById("roundNumber").textContent=`Round ${round} of ${config.totalRounds||"∞"}`;
   const lb=document.getElementById("leaderboard");lb.innerHTML="";
-  // Sort leaderboard with proper tie-breaking
-  leaderboard.sort((a,b) => {
+  const sorted = leaderboard.slice().sort((a,b) => {
     if (b.wins !== a.wins) return b.wins - a.wins;
-    // If wins are equal, use head-to-head
+    if (config.mode === "random_pairs") return 0;
     return getHeadToHeadResult(b.name, a.name);
-  }).forEach(t=>lb.innerHTML+=`<div class="flex justify-between text-sm gap-2"><span class="truncate min-w-0">${t.name}</span><span class="shrink-0">${t.wins}</span></div>`);
+  });
+  const topWins = sorted[0] ? sorted[0].wins : 0;
+  const tiedLeaders = sorted.filter(t => t.wins === topWins);
+  sorted.forEach(t => {
+    const rowClass = document.body.classList.contains("highlander") && tiedLeaders.some(x => (x.id || x.name) === (t.id || t.name)) ? "leaderboard-row tied-leader flex justify-between text-sm gap-2 py-1 border-b border-amber-500/20" : "leaderboard-row flex justify-between text-sm gap-2 py-1" + (document.body.classList.contains("highlander") ? " border-b border-amber-500/10" : "");
+    const winsClass = document.body.classList.contains("highlander") ? "wins-num shrink-0" : "shrink-0";
+    lb.innerHTML += `<div class="${rowClass}"><span class="truncate min-w-0">${t.name}</span><span class="${winsClass}">${t.wins}</span></div>`;
+  });
   const grid=document.getElementById("courtGrid");grid.innerHTML="";
   const courts=config.courtCount||3;
   const displayedMatches = matches.slice(0, courts);
+  const toRoman = (n) => { const r = ["","I","II","III","IV","V","VI","VII","VIII","IX","X"]; return n >= 1 && n <= 10 ? r[n] : String(n); };
   displayedMatches.forEach((m,i)=>{
+    if (m.court === undefined || m.court === null) throw new Error("Match missing court");
+    const courtLabel = document.body.classList.contains("highlander") ? ("COURT " + toRoman(m.court)) : m.court;
     const winnerClass=m.winner?'winner-card':'winter-card';
-    const courtLabel = m.court ?? (i + 1);
-    const team1Escaped = m.team1.replace(/'/g, "\\'");
-    const team2Escaped = m.team2.replace(/'/g, "\\'");
+    const team1Escaped = (m.team1 || "").replace(/'/g, "\\'");
+    const team2Escaped = (m.team2 || "").replace(/'/g, "\\'");
     grid.innerHTML+=`<div class="matchCard rounded-lg p-4 text-center ${winnerClass} text-white">
-      <div class="courtTitle font-bold mb-2 winter-text text-lg">Court ${courtLabel}</div>
+      <div class="courtTitle font-bold mb-2 winter-text text-lg">${courtLabel}</div>
       <div class="text-sm font-semibold leading-tight">${m.team1} vs ${m.team2}</div>
       <div class="mt-2 winter-text text-sm">Winner: ${m.winner||'TBD'}</div>
       ${!isReadOnly?`<div class="mt-2 flex flex-wrap gap-1 justify-center">
@@ -831,10 +1173,15 @@ function renderUI(){
       </div>`:''}
     </div>`;
   });
-  const byeTeamsElement=document.getElementById("byeTeams");
-  const byeTeamsList = teams.filter(team => !displayedMatches.flatMap(m => [m.team1, m.team2]).includes(team));
-  if (byeTeamsList.length > 0) {
-    byeTeamsElement.innerHTML = `<div class="winter-text text-cyan-300 text-xl subGlow">BYE: ${byeTeamsList.join(", ")}</div>`;
+  const byeTeamsElement = document.getElementById("byeTeams");
+  let byeList = [];
+  if (config.mode === "random_pairs") {
+    byeList = (currentRoundByes || []).map(p => typeof p === "object" && p != null && p.name != null ? p.name : String(p));
+  } else {
+    byeList = teams.filter(team => !displayedMatches.flatMap(m => [m.team1, m.team2]).includes(team));
+  }
+  if (byeList.length > 0) {
+    byeTeamsElement.innerHTML = `<div class="winter-text text-cyan-300 text-sm subGlow">BYE / Rest: ${byeList.join(", ")}</div>`;
   } else {
     byeTeamsElement.textContent = "";
   }
