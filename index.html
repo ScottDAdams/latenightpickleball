@@ -129,6 +129,7 @@
       pointer-events:none;
       z-index:0;
     }
+    body.highlander #bgFX{ opacity: 0; }
     #bgFX::before{
       content:"";
       position:absolute; inset:0;
@@ -214,11 +215,6 @@
       color: transparent;
       filter: drop-shadow(0 0 12px rgba(34,211,238,.20));
     }
-    @keyframes headerPulse {
-      0%, 100% { filter: drop-shadow(0 0 12px rgba(34,211,238,.20)); }
-      50% { filter: drop-shadow(0 0 24px rgba(34,211,238,.45)) drop-shadow(0 0 36px rgba(255,79,216,.25)); }
-    }
-    header .chrome { animation: headerPulse 2.5s ease-in-out infinite; }
     .subGlow{ text-shadow: 0 0 10px rgba(34,211,238,.25); }
     .glass{
       background: var(--glass);
@@ -311,7 +307,7 @@
     </div>
     <div id="playerCountRow" class="hidden">
       <label class="block mb-1 winter-text text-cyan-200">Number of Players</label>
-      <input type="number" id="playerCount" value="8" min="4" max="24" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" onchange="renderNameInputsDynamic()" />
+      <input type="number" id="playerCount" value="24" min="4" max="24" class="p-2 rounded text-black w-full border border-cyan-400/50 bg-white/10 focus:border-cyan-400" onchange="renderNameInputsDynamic()" />
     </div>
     <div>
       <label class="block mb-1 winter-text text-cyan-200">Number of Courts</label>
@@ -474,6 +470,9 @@ function onModeChange(){
     if (stormRow) stormRow.classList.remove("hidden");
     labelEl.textContent = "Player Names";
     document.body.classList.add("highlander");
+    document.getElementById("playerCount").value = 24;
+    document.getElementById("roundDuration").value = 12;
+    document.getElementById("countdownDuration").value = 30;
   } else {
     teamCountRow.classList.remove("hidden");
     playerCountRow.classList.add("hidden");
@@ -635,6 +634,20 @@ function assignCourtsToMatches(matchList, courtCount) {
 
 function getHeadToHeadResult(team1, team2) {
   // Returns 1 if team1 beat team2, -1 if team2 beat team1, 0 if no head-to-head or tie
+  if (config.mode === "random_pairs" && allSavedMatches && allSavedMatches.length) {
+    for (const m of allSavedMatches) {
+      var p1 = PAIRING.parsePairLabel(m.team1);
+      var p2 = PAIRING.parsePairLabel(m.team2);
+      var t1HasA = p1.indexOf(team1) !== -1, t2HasA = p2.indexOf(team1) !== -1;
+      var t1HasB = p1.indexOf(team2) !== -1, t2HasB = p2.indexOf(team2) !== -1;
+      if ((t1HasA && t2HasB) || (t1HasB && t2HasA)) {
+        if (m.winner === m.team1) return t1HasA ? 1 : -1;
+        if (m.winner === m.team2) return t2HasA ? 1 : -1;
+        return 0;
+      }
+    }
+    return 0;
+  }
   const allMatches = roundRobinSchedule.flat();
   for (const match of allMatches) {
     if ((match.team1 === team1 && match.team2 === team2) || 
@@ -916,29 +929,13 @@ function confirmEndEvent() {
 
 async function endEvent() {
   if (config.mode === "random_pairs") {
-    leaderboard.sort((a, b) => b.wins - a.wins);
-    const topWins = leaderboard[0].wins;
-    const tied = leaderboard.filter(t => t.wins === topWins);
-    if (tied.length > 1) {
-      const names = tied.map(t => t.name);
-      names.sort((a, b) => computeSOS(b, allSavedMatches) - computeSOS(a, allSavedMatches));
-      const bestSOS = computeSOS(names[0], allSavedMatches);
-      const coChampNames = names.filter(n => computeSOS(n, allSavedMatches) === bestSOS);
-      if (coChampNames.length > 1) {
-        config.finalWinners = tied.filter(t => coChampNames.includes(t.name)).map(t => t.id);
-        config.finalWinnerNames = coChampNames;
-        await saveEvent({ status: "event_done", config, teams: leaderboard.map(p => ({ name: p.name, wins: p.wins })) });
-        document.getElementById("winnerName").textContent = coChampNames.join(" & ");
-        const subEl = document.getElementById("winnerSubtitle");
-        if (subEl) subEl.textContent = "THERE CAN BE ONLY ONE… BUT TONIGHT WE HAVE LEGENDS.";
-        document.getElementById("finalLeaderboard").innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
-        showWinnerOverlay();
-        return;
-      }
-    }
-    leaderboard.sort((a, b) => b.wins - a.wins);
-    config.finalWinners = [leaderboard[0].id];
-    config.finalWinnerNames = [leaderboard[0].name];
+    var sorted = leaderboard.slice().sort(function (a, b) {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      return getHeadToHeadResult(b.name, a.name);
+    });
+    var top3 = sorted.slice(0, 3);
+    config.finalWinners = top3.map(function (t) { return t.id; }).filter(Boolean);
+    config.finalWinnerNames = top3.map(function (t) { return t.name; });
   } else {
     leaderboard.sort((a, b) => {
       if (b.wins !== a.wins) return b.wins - a.wins;
@@ -948,9 +945,11 @@ async function endEvent() {
   const extra = { status: "event_done" };
   if (config.mode === "random_pairs") extra.config = config, extra.teams = leaderboard.map(p => ({ name: p.name, wins: p.wins }));
   await saveEvent(extra);
-  document.getElementById("winnerName").textContent = leaderboard[0].name;
-  const subEl = document.getElementById("winnerSubtitle");
-  if (subEl) subEl.textContent = "";
+  if (config.mode !== "random_pairs") {
+    document.getElementById("winnerName").textContent = leaderboard[0].name;
+    const subEl = document.getElementById("winnerSubtitle");
+    if (subEl) subEl.textContent = "";
+  }
   showWinnerOverlay();
 }
 
@@ -982,7 +981,11 @@ function showWinnerOverlay() {
   const nameEl = document.getElementById("winnerName");
   const subEl = document.getElementById("winnerSubtitle");
   const isHighlander = document.body.classList.contains("highlander");
-  if (config.finalWinnerNames && config.finalWinnerNames.length > 0) {
+  var showTop3 = isHighlander && config.finalWinnerNames && config.finalWinnerNames.length > 0;
+  if (showTop3) {
+    nameEl.textContent = config.finalWinnerNames[0];
+    if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "TOP 3 — THERE CAN BE ONLY ONE." : "CHAMPION";
+  } else if (config.finalWinnerNames && config.finalWinnerNames.length > 0) {
     nameEl.textContent = config.finalWinnerNames.join(" & ");
     if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "THERE CAN BE ONLY ONE… BUT TONIGHT WE HAVE LEGENDS." : "CHAMPION";
   } else {
@@ -991,9 +994,16 @@ function showWinnerOverlay() {
   }
   const lb = document.getElementById("finalLeaderboard");
   lb.classList.remove("finalLeaderboard-cols-2", "finalLeaderboard-cols-3");
-  if (leaderboard.length > 16) lb.classList.add("finalLeaderboard-cols-3");
-  else if (leaderboard.length > 8) lb.classList.add("finalLeaderboard-cols-2");
-  lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
+  if (showTop3) {
+    lb.innerHTML = config.finalWinnerNames.map(function (name, i) {
+      var e = leaderboard.find(function (t) { return t.name === name; });
+      return "<div>" + (i + 1) + ". " + name + " — " + (e ? e.wins : 0) + "</div>";
+    }).join("");
+  } else {
+    if (leaderboard.length > 16) lb.classList.add("finalLeaderboard-cols-3");
+    else if (leaderboard.length > 8) lb.classList.add("finalLeaderboard-cols-2");
+    lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
+  }
   if (isHighlander) {
     nameEl.classList.add("winner-name-cinematic");
     playStormRumble();
@@ -1144,7 +1154,6 @@ function renderUI(){
   const lb=document.getElementById("leaderboard");lb.innerHTML="";
   const sorted = leaderboard.slice().sort((a,b) => {
     if (b.wins !== a.wins) return b.wins - a.wins;
-    if (config.mode === "random_pairs") return 0;
     return getHeadToHeadResult(b.name, a.name);
   });
   const topWins = sorted[0] ? sorted[0].wins : 0;
