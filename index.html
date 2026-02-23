@@ -936,6 +936,9 @@ async function endEvent() {
     var top3 = sorted.slice(0, 3);
     config.finalWinners = top3.map(function (t) { return t.id; }).filter(Boolean);
     config.finalWinnerNames = top3.map(function (t) { return t.name; });
+    var champWins = top3[0].wins;
+    var tiedWithChamp = sorted.filter(function (t) { return t.wins === champWins && t.name !== top3[0].name; });
+    config.finalChampionBeat = tiedWithChamp.filter(function (t) { return getHeadToHeadResult(top3[0].name, t.name) === 1; }).map(function (t) { return t.name; });
   } else {
     leaderboard.sort((a, b) => {
       if (b.wins !== a.wins) return b.wins - a.wins;
@@ -983,7 +986,14 @@ function showWinnerOverlay() {
   const isHighlander = document.body.classList.contains("highlander");
   var showTop3 = isHighlander && config.finalWinnerNames && config.finalWinnerNames.length > 0;
   if (showTop3) {
-    nameEl.textContent = config.finalWinnerNames[0];
+    var champName = config.finalWinnerNames[0];
+    var beatList = config.finalChampionBeat && config.finalChampionBeat.length ? config.finalChampionBeat : [];
+    if (beatList.length) {
+      var beatStr = beatList.length === 1 ? beatList[0] : beatList.slice(0, -1).join(", ") + " and " + beatList[beatList.length - 1];
+      nameEl.textContent = champName + " (beat " + beatStr + ")";
+    } else {
+      nameEl.textContent = champName;
+    }
     if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "TOP 3 — THERE CAN BE ONLY ONE." : "CHAMPION";
   } else if (config.finalWinnerNames && config.finalWinnerNames.length > 0) {
     nameEl.textContent = config.finalWinnerNames.join(" & ");
@@ -995,10 +1005,18 @@ function showWinnerOverlay() {
   const lb = document.getElementById("finalLeaderboard");
   lb.classList.remove("finalLeaderboard-cols-2", "finalLeaderboard-cols-3");
   if (showTop3) {
-    lb.innerHTML = config.finalWinnerNames.map(function (name, i) {
+    var sorted = leaderboard.slice().sort(function (a, b) {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      return getHeadToHeadResult(b.name, a.name);
+    });
+    var top3Html = config.finalWinnerNames.map(function (name, i) {
       var e = leaderboard.find(function (t) { return t.name === name; });
       return "<div>" + (i + 1) + ". " + name + " — " + (e ? e.wins : 0) + "</div>";
     }).join("");
+    var fullListHtml = sorted.map(function (t, i) { return "<div>" + (i + 1) + ". " + t.name + " — " + t.wins + "</div>"; }).join("");
+    lb.innerHTML = "<div class=\"font-bold mb-2 text-cyan-200\">Top 3</div>" + top3Html + "<div class=\"font-bold mt-4 mb-2 text-cyan-200\">All players</div>" + fullListHtml;
+    if (sorted.length > 16) lb.classList.add("finalLeaderboard-cols-3");
+    else if (sorted.length > 8) lb.classList.add("finalLeaderboard-cols-2");
   } else {
     if (leaderboard.length > 16) lb.classList.add("finalLeaderboard-cols-3");
     else if (leaderboard.length > 8) lb.classList.add("finalLeaderboard-cols-2");
