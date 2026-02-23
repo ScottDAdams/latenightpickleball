@@ -30,18 +30,6 @@
         radial-gradient(ellipse 100% 80% at 50% 0%, rgba(30,41,59,.85) 0%, rgba(15,23,42,.9) 35%, rgba(12,18,34,.92) 60%, rgba(2,6,23,.95) 100%);
       position: relative;
     }
-    body.highlander::before{
-      content: "";
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,.4) 100%);
-      opacity: .9;
-    }
-    body.highlander::after{
-      content: "";
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      opacity: .5;
-    }
     body.highlander header h1{
       background: linear-gradient(180deg, #fef3c7 0%, #f59e0b 25%, #d97706 50%, #b45309 75%, #92400e 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -90,6 +78,7 @@
     #winnerOverlay #finalLeaderboard{ font-size: clamp(0.875rem, 2vw, 1.875rem); max-height: 50vh; overflow: auto; }
     #winnerOverlay #finalLeaderboard.finalLeaderboard-cols-2{ column-count: 2; column-gap: 2rem; column-fill: balance; }
     #winnerOverlay #finalLeaderboard.finalLeaderboard-cols-3{ column-count: 3; column-gap: 1.5rem; column-fill: balance; }
+    #winnerOverlay #finalLeaderboard .top3-row{ font-weight: bold; font-size: 1.15em; color: #fcd34d; }
     body.highlander #winnerOverlay .winner-name-cinematic{
       background: linear-gradient(180deg, #fef3c7, #f59e0b);
       -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -129,7 +118,7 @@
       pointer-events:none;
       z-index:0;
     }
-    body.highlander #bgFX{ opacity: 0; }
+    body.highlander #bgFX{ display: none; }
     #bgFX::before{
       content:"";
       position:absolute; inset:0;
@@ -991,10 +980,11 @@ function showWinnerOverlay() {
     if (beatList.length) {
       var beatStr = beatList.length === 1 ? beatList[0] : beatList.slice(0, -1).join(", ") + " and " + beatList[beatList.length - 1];
       nameEl.textContent = champName + " (beat " + beatStr + ")";
+      if (subEl) subEl.textContent = "Tie-breaker: head-to-head.";
     } else {
       nameEl.textContent = champName;
+      if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "TOP 3 — THERE CAN BE ONLY ONE." : "CHAMPION";
     }
-    if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "TOP 3 — THERE CAN BE ONLY ONE." : "CHAMPION";
   } else if (config.finalWinnerNames && config.finalWinnerNames.length > 0) {
     nameEl.textContent = config.finalWinnerNames.join(" & ");
     if (subEl) subEl.textContent = config.finalWinnerNames.length > 1 ? "THERE CAN BE ONLY ONE… BUT TONIGHT WE HAVE LEGENDS." : "CHAMPION";
@@ -1009,12 +999,12 @@ function showWinnerOverlay() {
       if (b.wins !== a.wins) return b.wins - a.wins;
       return getHeadToHeadResult(b.name, a.name);
     });
-    var top3Html = config.finalWinnerNames.map(function (name, i) {
-      var e = leaderboard.find(function (t) { return t.name === name; });
-      return "<div>" + (i + 1) + ". " + name + " — " + (e ? e.wins : 0) + "</div>";
+    lb.innerHTML = sorted.map(function (t, i) {
+      var isTop3 = i < 3;
+      var rowClass = isTop3 ? " top3-row" : "";
+      var star = isTop3 ? "★ " : "";
+      return "<div class=\"" + rowClass + "\">" + star + (i + 1) + ". " + t.name + " — " + t.wins + "</div>";
     }).join("");
-    var fullListHtml = sorted.map(function (t, i) { return "<div>" + (i + 1) + ". " + t.name + " — " + t.wins + "</div>"; }).join("");
-    lb.innerHTML = "<div class=\"font-bold mb-2 text-cyan-200\">Top 3</div>" + top3Html + "<div class=\"font-bold mt-4 mb-2 text-cyan-200\">All players</div>" + fullListHtml;
     if (sorted.length > 16) lb.classList.add("finalLeaderboard-cols-3");
     else if (sorted.length > 8) lb.classList.add("finalLeaderboard-cols-2");
   } else {
