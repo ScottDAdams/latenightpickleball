@@ -42,15 +42,6 @@
       background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
       opacity: .5;
     }
-    @keyframes lightningFlicker {
-      0%, 88%, 100% { opacity: 0; }
-      90%, 93% { opacity: 0.07; }
-      91% { opacity: 0.14; }
-    }
-    body.highlander #lightningFlickerLayer{
-      background: radial-gradient(ellipse 100% 60% at 50% 10%, rgba(134,239,212,.2), transparent 60%);
-      animation: lightningFlicker 5s ease-in-out infinite;
-    }
     body.highlander header h1{
       background: linear-gradient(180deg, #fef3c7 0%, #f59e0b 25%, #d97706 50%, #b45309 75%, #92400e 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -132,25 +123,6 @@
       color: #d1fae5 !important;
       box-shadow: 0 0 14px rgba(34,197,94,.35) !important;
     }
-    /* Lightning: visible layer above bg (z-5) but below main UI (z-10); animation forced in JS */
-    @keyframes lightningBgFlash {
-      0%, 100% { opacity: 0; }
-      20% { opacity: 0.7; }
-      40% { opacity: 0; }
-    }
-    @keyframes lightningBgFlashChampion {
-      0%, 100% { opacity: 0; }
-      15% { opacity: 0.85; }
-      35% { opacity: 0.25; }
-      55% { opacity: 0; }
-    }
-    #lightningBgGlow{
-      position: fixed; inset: 0; pointer-events: none; z-index: 5;
-      background: radial-gradient(ellipse 140% 90% at 50% 15%, rgba(134,239,212,.7) 0%, rgba(94,234,212,.4) 30%, rgba(34,211,238,.2) 55%, transparent 75%);
-      opacity: 0;
-    }
-    #lightningBgGlow.on{ animation: lightningBgFlash 0.3s ease-out forwards; }
-    #lightningBgGlow.champion{ animation: lightningBgFlashChampion 0.7s ease-out forwards; }
     #bgFX{
       position: fixed;
       inset: 0;
@@ -312,8 +284,6 @@
 </head>
 <body class="min-h-screen flex flex-col text-white relative">
 <div id="bgFX"></div>
-<div id="lightningFlickerLayer" class="fixed inset-0 pointer-events-none z-0 opacity-0" aria-hidden="true"></div>
-<div id="lightningBgGlow" aria-hidden="true"></div>
 
 <header class="text-center py-6 relative z-10">
   <h1 class="text-5xl font-extrabold winter-header neonTitle chrome" id="headerTitle">Pickleball Event Maker</h1>
@@ -984,22 +954,6 @@ async function endEvent() {
   showWinnerOverlay();
 }
 
-function triggerLightningFlash(kind) {
-  const el = document.getElementById("lightningBgGlow");
-  if (!el) return;
-  el.classList.remove("on", "champion");
-  el.style.animation = "none";
-  el.offsetHeight;
-  el.style.animation = "";
-  requestAnimationFrame(function () {
-    el.classList.add(kind === "champion" ? "champion" : "on");
-    var duration = kind === "champion" ? 700 : 300;
-    setTimeout(function () {
-      el.classList.remove("on", "champion");
-    }, duration);
-  });
-}
-
 function playStormRumble() {
   if (!config.stormSound) return;
   try {
@@ -1042,7 +996,6 @@ function showWinnerOverlay() {
   lb.innerHTML = leaderboard.map((t, i) => `<div>${i + 1}. ${t.name} - ${t.wins}</div>`).join("");
   if (isHighlander) {
     nameEl.classList.add("winner-name-cinematic");
-    triggerLightningFlash("champion");
     playStormRumble();
     setTimeout(function () { showOverlay("winnerOverlay"); }, 450);
   } else {
@@ -1106,7 +1059,6 @@ async function recordWin(index,teamName){
      (m.team1 === match.team2 && m.team2 === match.team1))
   );
   if (matchIndex !== -1) allSavedMatches[matchIndex] = {...match};
-  if (document.body.classList.contains("highlander")) triggerLightningFlash("win");
   await saveEvent({matches, teams: leaderboard});
   renderUI();
   updateButtonStates();
