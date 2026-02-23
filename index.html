@@ -48,7 +48,7 @@
       91% { opacity: 0.14; }
     }
     body.highlander #lightningFlickerLayer{
-      background: #fff;
+      background: radial-gradient(ellipse 100% 60% at 50% 10%, rgba(134,239,212,.2), transparent 60%);
       animation: lightningFlicker 5s ease-in-out infinite;
     }
     body.highlander header h1{
@@ -122,15 +122,25 @@
       color: #d1fae5 !important;
       box-shadow: 0 0 14px rgba(34,197,94,.35) !important;
     }
-    @keyframes lightningBurst {
-      0% { opacity: 0; }
-      10% { opacity: 0.9; }
-      25% { opacity: 0; }
-      100% { opacity: 0; }
+    /* Background-only lightning: soft glow behind content (z-index 0), never over UI */
+    @keyframes lightningBgFlash {
+      0%, 100% { opacity: 0; }
+      15% { opacity: 0.4; }
+      30% { opacity: 0; }
     }
-    .lightning-flash{ position: fixed; inset: 0; background: #fff; pointer-events: none; z-index: 1; opacity: 0; }
-    .lightning-flash.on{ animation: lightningBurst 0.2s ease-out; }
-    .lightning-flash.champion{ animation: lightningBurst 0.5s ease-out; }
+    @keyframes lightningBgFlashChampion {
+      0%, 100% { opacity: 0; }
+      12% { opacity: 0.5; }
+      25% { opacity: 0.15; }
+      45% { opacity: 0; }
+    }
+    #lightningBgGlow{
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 120% 80% at 50% 20%, rgba(134,239,212,.5) 0%, rgba(94,234,212,.25) 25%, rgba(34,211,238,.12) 50%, transparent 70%);
+      opacity: 0;
+    }
+    #lightningBgGlow.on{ animation: lightningBgFlash 0.25s ease-out; }
+    #lightningBgGlow.champion{ animation: lightningBgFlashChampion 0.6s ease-out; }
     #bgFX{
       position: fixed;
       inset: 0;
@@ -293,6 +303,7 @@
 <body class="min-h-screen flex flex-col text-white relative">
 <div id="bgFX"></div>
 <div id="lightningFlickerLayer" class="fixed inset-0 pointer-events-none z-0 opacity-0" aria-hidden="true"></div>
+<div id="lightningBgGlow" aria-hidden="true"></div>
 
 <header class="text-center py-6 relative z-10">
   <h1 class="text-5xl font-extrabold winter-header neonTitle chrome" id="headerTitle">Pickleball Event Maker</h1>
@@ -383,8 +394,6 @@
     <div id="leaderboard" class="space-y-2"></div>
   </div>
 </main>
-<div id="lightningFlash" class="lightning-flash"></div>
-
 <div id="countdownOverlay" class="overlay hidden text-[10rem] font-bold animate-bounce winter-text neonTitle">0</div>
 <div id="goOverlay" class="overlay hidden text-[12rem] font-bold winter-text neonTitle" style="color:#ff4fd8;">GO!</div>
 <div id="timerOverlay" class="overlay hidden">
@@ -955,12 +964,12 @@ async function endEvent() {
 }
 
 function triggerLightningFlash(kind) {
-  const el = document.getElementById("lightningFlash");
+  const el = document.getElementById("lightningBgGlow");
   if (!el) return;
   el.classList.remove("on", "champion");
   el.offsetHeight;
   el.classList.add(kind === "champion" ? "champion" : "on");
-  setTimeout(() => { el.classList.remove("on", "champion"); }, kind === "champion" ? 500 : 200);
+  setTimeout(() => { el.classList.remove("on", "champion"); }, kind === "champion" ? 600 : 250);
 }
 
 function playStormRumble() {
